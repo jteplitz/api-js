@@ -1,0 +1,220 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+  
+  <title>Ordrin JS API Demo</title>
+  
+  <script type="text/javascript" src="../Ordrin.js"></script>
+  <script type="text/javascript" src="../Address.js"></script>
+  <script type="text/javascript" src="../DateTime.js"></script>
+  <script type="text/javascript" src="../Money.js"></script>
+  
+  <script type="text/javascript" src="datetimepicker.js"></script>
+  
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="jquery.json2html/jquery.json2html-2.0-min.js"></script>
+  
+  <script type="text/javascript">
+  Ordrin.initialize("iqR9QxyZ4BGaRMJBVL260g", "localhost:8001");
+  
+  function testDL() {
+    if (document.getElementById('dT').value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.getElementById('dT').value); }
+    var place = new Address(document.getElementById('zC').value, document.getElementById('cit').value, document.getElementById('sA').value);
+    
+    Ordrin.r.deliveryList(time, place, feed);
+  }
+  
+  function testDC() {
+    if (document.getElementById('dT1').value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.getElementById('dT1').value); }
+    var place = new Address(document.getElementById('zC1').value, document.getElementById('cit1').value, document.getElementById('sA1').value);
+    
+    Ordrin.r.deliveryCheck(document.getElementById('rID1').value, time, place, feed);
+  }
+
+  function testDF() {
+    var subtotal = new Money(document.getElementById('sT2').value);
+    var tip = new Money(document.getElementById('tip2').value);
+    
+    if (document.getElementById('dT2').value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.getElementById('dT2').value); }
+    var place = new Address(document.getElementById('zC2').value, document.getElementById('cit2').value, document.getElementById('sA2').value);
+    
+    Ordrin.r.deliveryFee(document.getElementById('rID2').value, subtotal, tip, time, place, feed);
+  }
+  
+  function testRD() {
+    Ordrin.r.details(document.getElementById('rID3').value, feed);
+  }
+
+  var transform = [{"tag":"div","html":function(obj) {
+    if (obj.id) { var id = obj.id; } else { if(obj.rid) { var id = obj.rid; } else { var id = obj.name; } } // set identifier as ID, restaurant ID, or name returned
+    return("<b>" + id + "</b>: " + JSON.stringify(obj)); // generate list of JSON data returned
+  }}]
+
+  function feed(data) {
+    if (data["error"]) { Ordrin._error(data["msg"]); }
+    $("#jsonOutput").json2html(data, transform);// document.getElementById('jsonOutput').innerHTML = JSON.stringify(data);
+  }
+  
+  function showForm(form) {
+    document.getElementById('delListForm').setAttribute('style', 'display:none');
+    document.getElementById('delCheckForm').setAttribute('style', 'display:none');
+    document.getElementById('delFeeForm').setAttribute('style', 'display:none');
+    document.getElementById('detailsForm').setAttribute('style', 'display:none');
+    
+    document.getElementById('jsonOutput').innerHTML = "";
+    
+    document.getElementById(form).setAttribute('style', 'display:inline');
+  }
+  
+  </script>
+
+  <style type="text/css" media="screen">
+  body {
+    background-color: #FFF;
+    font-size: 13px;
+    font-family: Arial, SunSans-Regular, Sans-Serif;
+    color:#564b47;  
+    padding:0 20px;
+    margin:0;
+  }
+  
+  p, pre, h2 {
+    padding:10px;
+    margin:0;
+  }
+   
+   
+  h1 {
+    font-size: 14px;
+    text-transform:uppercase;
+    text-align: right;
+    color: #564b47;
+    background-color: #ecefe9;
+    padding:5px 15px;
+    margin:0;
+  }
+   
+  h2 {
+    font-size:16px;
+    padding-top:10px;
+    text-transform:uppercase;
+    color: #564b47;
+    background-color: transparent;
+  }	
+   
+  h3 {
+    font-size:16px;
+    padding-top:10px;
+    text-transform:uppercase;
+    padding-left:0px;
+    color: #564b47;
+    background-color: transparent;
+  }
+  
+  a { 
+    color: #FFF;
+    font-size: 11px;
+    background-color:transparent;
+    text-decoration: none;
+    font-weight:bold;
+    padding-left:14px;
+  }
+   
+  pre { 
+    color: #564b47;
+    font-size: 13px;
+    background-color:transparent;
+    font-family: Courier, Monaco, Monospace;
+  }
+  
+  
+  
+  #menu {
+    position: absolute;
+    width: 200px;
+    left: 20px;
+    background-color: #ff1415;
+    padding:0;
+    margin:0;
+  }
+  #content {
+    margin-left: 200px;
+    padding-left:25px;
+    padding-bottom:25px;
+    background-color:#f4f4ef;
+    overflow: auto;
+  }
+  #delListForm, #delCheckForm, #delFeeForm, #detailsForm {
+    display:none;
+  }
+</style>
+
+</head>
+
+<body>
+<p align="right"><a href="http://www.ordr.in"><img src="http://ordr.in/images/ordrin-net-logo.png" /></a></p> 
+<h1>ordrin javascript api demo</h1>
+
+<div id="menu"> 
+<h2>Restaurant API</h2>
+<a href="#delList" onclick="showForm('delListForm');">Delivery List</a><br />
+<a href="#delCheck" onclick="showForm('delCheckForm');">Delivery Check</a><br />
+<a href="#delFee" onclick="showForm('delFeeForm');">Delivery Fee</a><br />
+<a href="#details" onclick="showForm('detailsForm');">Restaurant Details</a><br /><br />
+</div> 
+ 
+<div id="content"> 
+  <h3>Select one of the functions at the left to begin testing.</h3>
+  <div id="delListForm">
+    <form>
+      Date/time: <input id="dT" type="text" size="25"><a href="javascript:NewCal('dT','mmmddyyyy',true,24)"><img src="cal.gif" width="16" height="16" border="0" alt="Pick a date"></a><br />
+      Street address: <input id="sA" type="text" size="35" value="1 Main St"> <br />
+      City: <input id="cit" type="text" size="15" value="College Station"> <br />
+      Zip code: <input id ="zC" type="text" size="5" value="77840"> <br /><br />
+      <input type="submit" value="Submit" onclick="testDL();"> <input type="reset" value="Reset"> 
+    </form>
+  </div>
+  
+  <div id="delCheckForm">
+    <form>
+      Restaurant ID: <input id="rID1" type="text" size="4"> <br />
+      Date/time: <input id="dT1" type="text" size="25"><a href="javascript:NewCal('dT1','mmmddyyyy',true,24)"><img src="cal.gif" width="16" height="16" border="0" alt="Pick a date"></a><br />
+      Street address: <input id="sA1" type="text" size="35" value="1 Main St"> <br />
+      City: <input id="cit1" type="text" size="15" value="College Station"> <br />
+      Zip code: <input id ="zC1" type="text" size="5" value="77840"> <br /><br />
+      <input type="submit" value="Submit" onclick="testDC();"> <input type="reset" value="Reset"> 
+    </form>
+  </div>
+  
+  <div id="delFeeForm">
+    <form>
+      Subtotal: <input id="sT2" type="text" size="4"><br />
+      Tip: <input id="tip2" type="text" size="4"><br /><br />
+      Restaurant ID: <input id="rID2" type="text" size="4"> <br />
+      Date/time: <input id="dT2" type="text" size="25"><a href="javascript:NewCal('dT2','mmmddyyyy',true,24)"><img src="cal.gif" width="16" height="16" border="0" alt="Pick a date"></a><br />
+      Street address: <input id="sA2" type="text" size="35" value="1 Main St"> <br />
+      City: <input id="cit2" type="text" size="15" value="College Station"> <br />
+      Zip code: <input id ="zC2" type="text" size="5" value="77840"> <br /><br />
+      <input type="submit" value="Submit" onclick="testDF();"> <input type="reset" value="Reset"> 
+    </form>
+  </div>
+  
+  <div id="detailsForm">
+    <form>
+      Restaurant ID: <input id="rID3" type="text" size="4"> <br />
+      <input type="submit" value="Submit" onclick="testRD();"> <input type="reset" value="Reset"> 
+    </form>
+  </div>
+  
+  <h3>Response</h3>
+  <div id="jsonOutput">
+
+</div>
+</div> 
+
+</body>
+</html>
