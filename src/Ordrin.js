@@ -242,7 +242,7 @@ Ordrin = {
       if (orderID) { Ordrin._apiRequest("uG", "u", func, 3, this.currEmail, "order", orderID); } else { Ordrin._apiRequest("uG", "u", func, 2, this.currEmail, "orders"); }
     },
     updatePassword: function(password, func) {
-      Ordrin._apiRequest("uPu", "u", func, 1, this.currEmail, ordrin_SHA256(password));
+      Ordrin._apiRequest("uPu", "u", func, 2, this.currEmail, "password", "password=" + ordrin_SHA256(password));
       this.currPass = password;
     }
   }

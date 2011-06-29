@@ -55,7 +55,9 @@
     switch(document.userAPIForm.func.value) {
       case "getAcct": Ordrin.u.getAcct(feed); break;
       case "makeAcct": Ordrin.u.makeAcct(document.userAPIForm.email.value, document.userAPIForm.password.value, document.userAPIForm.firstName.value, document.userAPIForm.lastName.value, feed); break;
-      case "updatePass": Ordrin.u.updatePassword(document.userAPIForm.password.value, feed); break;
+      case "updatePass":
+        Ordrin.u.setCurrAcct(document.userAPIForm.email.value, document.userAPIForm.oldPassword.value);
+        Ordrin.u.updatePassword(document.userAPIForm.password.value, feed); break;
       case "getAddr": Ordrin.u.getAddress(document.userAPIForm.addrNick.value, feed); break;
       case "updAddr":
         var place = new Address(document.userAPIForm.sA.value, document.userAPIForm.sA2.value, document.userAPIForm.city.value, document.userAPIForm.zip.value, document.userAPIForm.state.value, document.userAPIForm.phone.value, document.userAPIForm.addrNick.value);
@@ -261,7 +263,7 @@
       </optgroup>
     </select><br /><br />
     Email: <input name="email" type="text" size="20" value="test2@testing.com"> <br />
-    Password: <input name="password" type="password" size="20" value="testing"><br /><br />
+    Password: <input name="password" type="text" size="20" value="testing"> <input name="oldPassword" type="text" size="20" value="old password (if updating)"> <br /><br />
     First name: <input name="firstName" type="text" size="12" value="Test"> Last name: <input name="lastName" type="text" size="12" value="Testing"><br />
     
     Address name (home, work, etc.): <input name="addrNick" type="text" size="10" value="Home"><br />
