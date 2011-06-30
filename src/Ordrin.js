@@ -144,6 +144,7 @@ Ordrin = {
       // check integrity of objects
       Ordrin._objCheck("dTime", dTime);
       Ordrin._objCheck("addr", addr);
+      addr.validate();
       
       // API request 
       Ordrin._apiRequest("r", "dl", func, 2, dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI("r"));
@@ -152,6 +153,7 @@ Ordrin = {
       // check integrity of objects
       Ordrin._objCheck("dTime", dTime);
       Ordrin._objCheck("addr", addr);
+      addr.validate();
       if (!this.checkNums.test(restID)) { Ordrin._error("Restaurant ID must be numerical."); }
       
       // API request 
@@ -161,12 +163,12 @@ Ordrin = {
       // check integrity of objects
       Ordrin._objCheck("dTime", dTime);
       Ordrin._objCheck("addr", addr);
+      addr.validate();
       Ordrin._objCheck("money", subtotal);
       Ordrin._objCheck("money", tip);
                        
       if (!this.checkNums.test(restID)) { Ordrin._error("Restaurant ID must be numerical."); }
-      if (!this.checkNums.test(subtotal) || !this.checkNums.test(tip)) { Ordrin._error("Subtotal and tip must be numerical."); }
-      
+            
       // API request 
       Ordrin._apiRequest("r", "fee", func, 5, restID, subtotal.ordrin_convertForAPI(), tip.ordrin_convertForAPI(), dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI("r"));
     },
@@ -223,8 +225,10 @@ Ordrin = {
     getAddress: function(nickname, func) {
       if (nickname) { Ordrin._apiRequest("uG", "u", func, 3, this.currEmail, "addrs", nickname); } else { Ordrin._apiRequest("uG", "u", func, 2, this.currEmail, "addrs"); }
     },
-    updateAddress: function(place, func) {
-      Ordrin._apiRequest("uPu", "u", func, 3, this.currEmail, "addrs", place.nick, "addr=" + place.street, "addr2=" + place.street2, "city=" + place.city, "state=" + place.state, "zip=" + place.zip, "phone=" + place.phone);  
+    updateAddress: function(addr, func) {
+      Ordrin._objCheck("addr", addr);
+      addr.validate();
+      Ordrin._apiRequest("uPu", "u", func, 3, this.currEmail, "addrs", addr.nick, "addr=" + addr.street, "addr2=" + addr.street2, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone);  
     },
     deleteAddress: function(nickname, func) {
       Ordrin._apiRequest("uD", "u", func, 3, this.currEmail, "addrs", nickname);
@@ -232,8 +236,10 @@ Ordrin = {
     getCard: function(nickname, func) {
       if (nickname) { Ordrin._apiRequest("uG", "u", func, 3, this.currEmail, "ccs", nickname); } else { Ordrin._apiRequest("uG", "u", func, 2, this.currEmail, "ccs"); }
     },
-    updateCard: function(nickname, func) {
-      Ordrin._apiRequest("uPu", "u", func, 3, this.currEmail, "ccs", nickname);  
+    updateCard: function(nickname, name, number, cvc, expiryMonth, expiryYear, addr, func) {
+      Ordrin._objCheck("addr", addr);    
+      addr.validate();
+      Ordrin._apiRequest("uPu", "u", func, 3, this.currEmail, "ccs", nickname, "name=" + name, "number=" + number, "cvc=" + cvc, "expiry_month=" + expiryMonth, "expiry_year=" + expiryYear, "bill_addr=" + addr.street, "bill_addr2=" + addr.street2, "bill_city=" + addr.city, "bill_state=" + addr.state, "bill_zip=" + addr.zip);  
     },
     deleteCard: function(nickname, func) {
       Ordrin._apiRequest("uD", "u", func, 3, this.currEmail, "ccs", nickname);

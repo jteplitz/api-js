@@ -25,18 +25,18 @@ function Address(street, street2, city, zip, state, phone, nick) { // last three
 
 Address.prototype.validate = function() {
   var checkZip = /(^\d{5}$)|(^\d{5}-\d{4}$)/; // regex for Canadian functionality (later to be added): /^[ABCEGHJKLMNPRSTVXY][0-9][A-Z][0-9][A-Z][0-9]$/
-  if (!checkZip.test(this.zip)) { error("Invalid zip code; only digits (with total length of 5 or ZIP+4) allowed."); return false; }
+  if (!checkZip.test(this.zip)) { Ordrin._error("Invalid zip code; only digits (with total length of 5 or ZIP+4) allowed."); return false; }
   var checkPhone = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
-  if (!checkPhone.test(this.phone)) { error("Invalid U.S. phone number."); return false; }
+  if (this.phone && !checkPhone.test(this.phone)) { Ordrin._error("Invalid U.S. phone number."); return false; }
   
   var checkLetters = /[A-Za-z]/;
-  if (!checkLetters.test(this.city)) { error("Invalid city; only letters allowed."); return false; }
+  if (!checkLetters.test(this.city)) { Ordrin._error("Invalid city; only letters allowed."); return false; }
   var checkState = /^([A-Za-z]){2}$/
-  if (!checkLetters.test(this.state)) { error("Invalid state; only letters allowed."); return false; }
+  if (!checkLetters.test(this.state)) { Ordrin._error("Invalid state; only letters allowed."); return false; }
   
   return true;
 }
 
-Address.prototype.ordrin_convertForAPI = function(API) {
-  if (API == "r") { return this.zip + "/" + this.city + "/" + this.street; } else { return ""; }
+Address.prototype.ordrin_convertForAPI = function() {
+  return this.zip + "/" + this.city + "/" + this.street;
 }
