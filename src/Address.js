@@ -11,7 +11,6 @@
   // CHECK: is Date argument object Date?
 
 function Address(street, street2, city, zip, state, phone, nick) { // last three arguments optional w/ Restaurant API in particular
-  // look at URL function to encode
   this.nick = nick;
   this.street = street.split(" ").join("+");
   if (street2) { this.street2 = street2.split(" ").join("+"); }
@@ -19,24 +18,37 @@ function Address(street, street2, city, zip, state, phone, nick) { // last three
   this.zip = zip;
   this.state = state;
   this.phone = phone;
-  
-  return true;
 }
 
-Address.prototype.validate = function() {
-  var checkZip = /(^\d{5}$)|(^\d{5}-\d{4}$)/; // regex for Canadian functionality (later to be added): /^[ABCEGHJKLMNPRSTVXY][0-9][A-Z][0-9][A-Z][0-9]$/
-  if (!checkZip.test(this.zip)) { Ordrin._error("Invalid zip code; only digits (with total length of 5 or ZIP+4) allowed."); return false; }
-  var checkPhone = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
-  if (this.phone && !checkPhone.test(this.phone)) { Ordrin._error("Invalid U.S. phone number."); return false; }
+Address.prototype = {
+  checkZip: function() {
+    var zipRegex = /(^\d{5}$)|(^\d{5}-\d{4}$)/; // regex for Canadian functionality (later to be added): /^[ABCEGHJKLMNPRSTVXY][0-9][A-Z][0-9][A-Z][0-9]$/
+    if (!zipRegex.test(this.zip)) { Ordrin._error("Invalid zip code; only digits (with total length of 5 or ZIP+4) allowed."); return false; } else { return true; }
+  },
   
-  var checkLetters = /[A-Za-z]/;
-  if (!checkLetters.test(this.city)) { Ordrin._error("Invalid city; only letters allowed."); return false; }
-  var checkState = /^([A-Za-z]){2}$/
-  if (!checkLetters.test(this.state)) { Ordrin._error("Invalid state; only letters allowed."); return false; }
+  checkPhone: function() {
+    var phoneRegex = /^\(?(\d{3})\)?[- .]?(\d{3})[- .]?(\d{4})$/;
+    if (this.phone && !phoneRegex.test(this.phone)) { Ordrin._error("Invalid U.S. phone number."); return false; } else { return true; }
+  },
   
-  return true;
-}
+  checkCity: function() {
+    var cityRegex = /[A-Za-z]/;
+    if (!cityRegex.test(this.city)) { Ordrin._error("Invalid city; only letters allowed."); return false; } else { return true; }
+  },
+  
+  checkState: function() {
+    var checkState = /^([A-Za-z]){2}$/
+    if (!checkState.test(this.state)) { Ordrin._error("Invalid state; only letters allowed."); return false; } else { return true; }
+  },
+  
+  validate: function() {
+    this.checkZip();
+    this.checkCity();
+    this.checkState();
+    this.checkPhone();
+  },
 
-Address.prototype.ordrin_convertForAPI = function() {
-  return this.zip + "/" + this.city + "/" + this.street;
+  ordrin_convertForAPI: function() {
+    return this.zip + "/" + this.city + "/" + this.street;
+  }
 }

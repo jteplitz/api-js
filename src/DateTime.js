@@ -1,10 +1,12 @@
 /*
- DateTime Component: either "ASAP" or format [2 digit month]-[2 digit day]+[2 digit hours (24 hour clock):[2 digit minutes]
+ DateTime Component: Extends native Date object in Javascript
+ Converted to API as either "ASAP" or URI format [2 digit month]-[2 digit day]+[2 digit hours (24 hour clock):[2 digit minutes]
  
  Note: ALWAYS use local time!
 */
 
 Date.prototype.ordrin_convertForAPI = function() {
+  this.ordrin_validate();
   if (this.asap) { return "ASAP"; } else {
     var month = this.getMonth();
     var date = this.getDate();
@@ -23,4 +25,9 @@ Date.prototype.ordrin_convertForAPI = function() {
 
 Date.prototype.setASAP = function() {
   this.asap = 1;
+}
+
+Date.prototype.ordrin_validate = function() {
+  oiNow = new Date();
+  if (this.getTime() < oiNow.getTime()) { Ordrin._error("Date and time cannot be in the past."); }
 }

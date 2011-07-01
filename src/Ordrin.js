@@ -17,13 +17,16 @@ Ordrin = {
   _apiMethod: "", // whether a reverse origin proxy or JSONP will be used to access API
   _site: "", // domain at which API instance is being run
   _key: "", // API developer key
+  _errs: [], // error array pushed into and thrown at end of errors
   
   initialize: function(key, site, apiMethod) {
     // establish the developer key and site used
-    if (!key) { this._error("Only GET requests allowed without an API key."); }
-    if (!site) { this._error("Site must be provided for initialization."); }
+    if (!key) { this._errs.push({"connection", "API key required"}); }
+    if (!site) { this._errs.push({"connection", "no site provided"}); }
     this._site = site;
     this._key = key;
+    
+    if (_errs) { throw _errs; }
     
     // and if API method specified, add JSONP to append (strung into end of all queries)
     if (apiMethod) {
@@ -37,102 +40,96 @@ Ordrin = {
 
   
   _apiRequest: function(api, request, func, numberofURLParams, params) {
-    var paramsURL = "";
-    var userAuth = 0;
-    
-    console.log("current user: " + Ordrin.u.currEmail + ", current password: " + Ordrin.u.currPass);
-    
-    // string together all params for either GET or POST submission (later PUT and DELETE)
-    if (api == "uP" || api == "uPu" || api == "uD") {
-      for (var i = 4; i < 4+numberofURLParams; i++) {
-        paramsURL = paramsURL + "/" + arguments[i];
-        console.log(paramsURL);
+      var paramsURL = "";
+      var userAuth = 0;
+      
+      console.log("current user: " + Ordrin.u.currEmail + ", current password: " + Ordrin.u.currPass);
+      
+      // string together all params for either GET or POST submission (later PUT and DELETE)
+      if (api == "uP" || api == "uPu" || api == "uD") {
+        for (var i = 4; i < 4+numberofURLParams; i++) {
+          paramsURL = paramsURL + "/" + arguments[i];
+          console.log(paramsURL);
+        }
+        
+        // string together whole request
+        console.log("api: " + api + ", request: " + request + ", paramsURL: " + paramsURL + ", Ordrin._append: " + Ordrin._append);
+      } else { 
+        for (var i = 4; i < arguments.length; i++) {
+          paramsURL = paramsURL + "/" + arguments[i];
+          console.log(paramsURL);
+        }
+        
+        // string together whole request
+        console.log("api: " + api + ", request: " + request + ", paramsURL: " + paramsURL + ", Ordrin._append: " + Ordrin._append);
       }
       
-      // string together whole request
-      console.log("api: " + api + ", request: " + request + ", paramsURL: " + paramsURL + ", Ordrin._append: " + Ordrin._append);
-    } else { 
-      for (var i = 4; i < arguments.length; i++) {
-        paramsURL = paramsURL + "/" + arguments[i];
-        console.log(paramsURL);
+      if (this._xmlhttp) { // reverse origin proxy method
+        var url = "http://" + this._site + "/" + request + paramsURL + Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
+        console.log("url: " + url);
+        
+        // set what kind of connection is being made based on API (user API split into a get and post component)
+        switch (api) {
+          case "r": this._xmlhttp.open("GET",url,true); break;
+          case "o": this._xmlhttp.open("POST",url,true); break;
+          case "uG": this._xmlhttp.open("GET",url,true); userAuth = 1; break;
+          case "uP": this._xmlhttp.open("POST",url,true);
+            var outForm = "";
+            for (var i = 4+numberofURLParams; i < arguments.length; i++) {
+              if (outForm.length != 0) { outForm += "&"; }
+              outForm += arguments[i]; 
+            } console.log(outForm);
+            if (arguments[6].indexOf("first_name") !== -1) { userAuth = 1; }
+            break;
+          case "uPu": this._xmlhttp.open("PUT",url,true);
+            var outForm = "";
+            for (var i = 4+numberofURLParams; i < arguments.length; i++) {
+              if (outForm.length != 0) { outForm += "&"; }
+              outForm += arguments[i]; 
+            } console.log(outForm);
+            userAuth = 1;
+            break;
+          case "uD": this._xmlhttp.open("DELETE",url,true); 
+            var outForm = "";
+            for (var i = 4+numberofURLParams; i < arguments.length; i++) {
+              if (outForm.length != 0) { outForm += "&"; }
+              outForm += arguments[i]; 
+            } console.log(outForm);
+            userAuth = 1;
+            break;
+        }
+        
+        this._xmlhttp.onreadystatechange = function() { if(this.readyState==4 && this.status==200) { func(this.responseText); console.log("response: " + this.responseText);} };
+        this._xmlhttp.setRequestHeader("X-NAAMA-CLIENT-AUTHENTICATION", 'id="' + this._key + '", version="1"');
+        if (userAuth) {
+          console.log('uri: /' + request + paramsURL + Ordrin._append)
+          var hashcode = ordrin_SHA256(ordrin_SHA256(Ordrin.u.currPass) + Ordrin.u.currEmail + "/" + request + paramsURL + Ordrin._append);
+          console.log("SHA pass: " + ordrin_SHA256(Ordrin.u.currPass));
+          console.log("whole hash: " + hashcode);
+          this._xmlhttp.setRequestHeader("X-NAAMA-AUTHENTICATION", 'username="' + Ordrin.u.currEmail + '", response="' + hashcode + '", version="1"');
+        }
+        this._xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        
+        if(outForm) { this._xmlhttp.send(outForm); } else { this._xmlhttp.send(); }
+      } else {
+        if (api == "uG" || api ==  "uP" || api == "uPu" || api == "uD") { apiStripped = "u"; } else { apiStripped = api; }
+        var url = "https://" + apiStripped + "-test.ordr.in/" + request + paramsURL + Ordrin._append + func;
+        console.log("url: " + url);
+        if(document.getElementById('jsonp')) { document.getElementById('jsonp').parentNode.removeChild(document.getElementById('jsonp')); } // clean up any previous scripts injected into head
+        // script injection
+        var s = document.createElement('script');
+        s.src = url;
+        s.type = 'text/javascript';
+        s.id = "jsonp";
+      
+        if(document.getElementsByTagName('head').length > 0) document.getElementsByTagName('head')[0].appendChild(s);
       }
-      
-      // string together whole request
-      console.log("api: " + api + ", request: " + request + ", paramsURL: " + paramsURL + ", Ordrin._append: " + Ordrin._append);
-    }
-    
-    if (this._xmlhttp) { // reverse origin proxy method
-      var url = "http://" + this._site + "/" + request + paramsURL + Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
-      console.log("url: " + url);
-      
-      // set what kind of connection is being made based on API (user API split into a get and post component)
-      switch (api) {
-        case "r": this._xmlhttp.open("GET",url,true); break;
-        case "o": this._xmlhttp.open("POST",url,true); break;
-        case "uG": this._xmlhttp.open("GET",url,true); userAuth = 1; break;
-        case "uP": this._xmlhttp.open("POST",url,true);
-          var outForm = "";
-          for (var i = 4+numberofURLParams; i < arguments.length; i++) {
-            if (outForm.length != 0) { outForm += "&"; }
-            outForm += arguments[i]; 
-          } console.log(outForm);
-          if (arguments[6].indexOf("first_name") !== -1) { userAuth = 1; }
-          break;
-        case "uPu": this._xmlhttp.open("PUT",url,true);
-          var outForm = "";
-          for (var i = 4+numberofURLParams; i < arguments.length; i++) {
-            if (outForm.length != 0) { outForm += "&"; }
-            outForm += arguments[i]; 
-          } console.log(outForm);
-          userAuth = 1;
-          break;
-        case "uD": this._xmlhttp.open("DELETE",url,true); 
-          var outForm = "";
-          for (var i = 4+numberofURLParams; i < arguments.length; i++) {
-            if (outForm.length != 0) { outForm += "&"; }
-            outForm += arguments[i]; 
-          } console.log(outForm);
-          userAuth = 1;
-          break;
-      }
-      
-      this._xmlhttp.onreadystatechange = function() { if(this.readyState==4 && this.status==200) { func(this.responseText); console.log("response: " + this.responseText);} };
-      this._xmlhttp.setRequestHeader("X-NAAMA-CLIENT-AUTHENTICATION", 'id="' + this._key + '", version="1"');
-      if (userAuth) {
-        console.log('uri: /' + request + paramsURL + Ordrin._append)
-        var hashcode = ordrin_SHA256(ordrin_SHA256(Ordrin.u.currPass) + Ordrin.u.currEmail + "/" + request + paramsURL + Ordrin._append);
-        console.log("SHA pass: " + ordrin_SHA256(Ordrin.u.currPass));
-        console.log("whole hash: " + hashcode);
-        this._xmlhttp.setRequestHeader("X-NAAMA-AUTHENTICATION", 'username="' + Ordrin.u.currEmail + '", response="' + hashcode + '", version="1"');
-      }
-      this._xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      
-      if(outForm) { this._xmlhttp.send(outForm); } else { this._xmlhttp.send(); }
-    } else {
-      if (api == "uG" || api ==  "uP" || api == "uPu" || api == "uD") { apiStripped = "u"; } else { apiStripped = api; }
-      var url = "https://" + apiStripped + "-test.ordr.in/" + request + paramsURL + Ordrin._append + func;
-      console.log("url: " + url);
-      if(document.getElementById('jsonp')) { document.getElementById('jsonp').parentNode.removeChild(document.getElementById('jsonp')); } // clean up any previous scripts injected into head
-      // script injection
-      var s = document.createElement('script');
-      s.src = url;
-      s.type = 'text/javascript';
-      s.id = "jsonp";
-    
-      if(document.getElementsByTagName('head').length > 0) document.getElementsByTagName('head')[0].appendChild(s);
-    }
   },
   
-  _objCheck: function(type, obj) {
-    switch (type) {
-      case "addr": if (!obj.street || !obj.city || !obj.zip) { this._error("Address must be provided and fully formed as Address object in API."); } break;
-      case "dTime": if (Object.prototype.toString.call(obj) !== '[object Date]') { this._error("Date must be provided as Javascript's built-in Date object or ASAP."); } break;
-      case "money": if (!obj.amount) { this._error("Money must be provided and fully formed as Money object in API."); } break;
-    }
-  },
   _error: function(msg) {
+    this._errFlag = 1;
     console.log("Ordrin error: " + msg);
-    alert("Ordrin error: " + msg);    
+    alert("Ordrin error: " + msg);
   },
   
 
@@ -142,8 +139,6 @@ Ordrin = {
     
     deliveryList: function(dTime, addr, func) {
       // check integrity of objects
-      Ordrin._objCheck("dTime", dTime);
-      Ordrin._objCheck("addr", addr);
       addr.validate();
       
       // API request 
@@ -151,8 +146,6 @@ Ordrin = {
     },
     deliveryCheck: function(restID, dTime, addr, func) {
       // check integrity of objects
-      Ordrin._objCheck("dTime", dTime);
-      Ordrin._objCheck("addr", addr);
       addr.validate();
       if (!this.checkNums.test(restID)) { Ordrin._error("Restaurant ID must be numerical."); }
       
@@ -161,12 +154,7 @@ Ordrin = {
     },
     deliveryFee: function(restID, subtotal, tip, dTime, addr, func) {
       // check integrity of objects
-      Ordrin._objCheck("dTime", dTime);
-      Ordrin._objCheck("addr", addr);
-      addr.validate();
-      Ordrin._objCheck("money", subtotal);
-      Ordrin._objCheck("money", tip);
-                       
+      addr.validate(); 
       if (!this.checkNums.test(restID)) { Ordrin._error("Restaurant ID must be numerical."); }
             
       // API request 
@@ -226,7 +214,6 @@ Ordrin = {
       if (nickname) { Ordrin._apiRequest("uG", "u", func, 3, this.currEmail, "addrs", nickname); } else { Ordrin._apiRequest("uG", "u", func, 2, this.currEmail, "addrs"); }
     },
     updateAddress: function(addr, func) {
-      Ordrin._objCheck("addr", addr);
       addr.validate();
       Ordrin._apiRequest("uPu", "u", func, 3, this.currEmail, "addrs", addr.nick, "addr=" + addr.street, "addr2=" + addr.street2, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone);  
     },
@@ -236,8 +223,7 @@ Ordrin = {
     getCard: function(nickname, func) {
       if (nickname) { Ordrin._apiRequest("uG", "u", func, 3, this.currEmail, "ccs", nickname); } else { Ordrin._apiRequest("uG", "u", func, 2, this.currEmail, "ccs"); }
     },
-    updateCard: function(nickname, name, number, cvc, expiryMonth, expiryYear, addr, func) {
-      Ordrin._objCheck("addr", addr);    
+    updateCard: function(nickname, name, number, cvc, expiryMonth, expiryYear, addr, func) {   
       addr.validate();
       Ordrin._apiRequest("uPu", "u", func, 3, this.currEmail, "ccs", nickname, "name=" + name, "number=" + number, "cvc=" + cvc, "expiry_month=" + expiryMonth, "expiry_year=" + expiryYear, "bill_addr=" + addr.street, "bill_addr2=" + addr.street2, "bill_city=" + addr.city, "bill_state=" + addr.state, "bill_zip=" + addr.zip);  
     },
