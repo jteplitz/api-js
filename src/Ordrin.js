@@ -21,12 +21,12 @@ Ordrin = {
   
   initialize: function(key, site, apiMethod) {
     // establish the developer key and site used
-    if (!key) { this._errs.push({"connection", "API key required"}); }
-    if (!site) { this._errs.push({"connection", "no site provided"}); }
+    if (!key) { this._errs.push(["connection", "API key required"]); }
+    if (!site) { this._errs.push(["connection", "no site provided"]); }
     this._site = site;
     this._key = key;
     
-    if (_errs) { throw _errs; }
+    if (this._errs) { throw this._errs; }
     
     // and if API method specified, add JSONP to append (strung into end of all queries)
     if (apiMethod) {
@@ -42,6 +42,8 @@ Ordrin = {
   _apiRequest: function(api, request, func, numberofURLParams, params) {
       var paramsURL = "";
       var userAuth = 0;
+      
+      if (this._errs) { throw this._errs; }
       
       console.log("current user: " + Ordrin.u.currEmail + ", current password: " + Ordrin.u.currPass);
       
@@ -126,13 +128,6 @@ Ordrin = {
       }
   },
   
-  _error: function(msg) {
-    this._errFlag = 1;
-    console.log("Ordrin error: " + msg);
-    alert("Ordrin error: " + msg);
-  },
-  
-
   // Restaurant API
   r: {
     checkNums: /^\s*\d+\s*$/,
@@ -147,7 +142,7 @@ Ordrin = {
     deliveryCheck: function(restID, dTime, addr, func) {
       // check integrity of objects
       addr.validate();
-      if (!this.checkNums.test(restID)) { Ordrin._error("Restaurant ID must be numerical."); }
+      if (!this.checkNums.test(restID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
       
       // API request 
       Ordrin._apiRequest("r", "dc", func, 3, restID, dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI("r"));
@@ -155,14 +150,14 @@ Ordrin = {
     deliveryFee: function(restID, subtotal, tip, dTime, addr, func) {
       // check integrity of objects
       addr.validate(); 
-      if (!this.checkNums.test(restID)) { Ordrin._error("Restaurant ID must be numerical."); }
+      if (!this.checkNums.test(restID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
             
       // API request 
       Ordrin._apiRequest("r", "fee", func, 5, restID, subtotal.ordrin_convertForAPI(), tip.ordrin_convertForAPI(), dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI("r"));
     },
     details: function(restaurantID, func) {
       // check integrity of objects
-      if (!this.checkNums.test(restaurantID)) { Ordrin._error("Restaurant ID must be numerical."); }
+      if (!this.checkNums.test(restaurantID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
       
       // API request
       Ordrin._apiRequest("r", "rd", func, 1, restaurantID);

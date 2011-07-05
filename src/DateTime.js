@@ -29,5 +29,5 @@ Date.prototype.setASAP = function() {
 
 Date.prototype.ordrin_validate = function() {
   oiNow = new Date();
-  if (this.getTime() < oiNow.getTime()) { Ordrin._error("Date and time cannot be in the past."); }
+  if (this.getTime() < oiNow.getTime()) Ordrin._errs.push("validation", "date/time cannot be in past");
 }

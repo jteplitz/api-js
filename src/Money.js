@@ -6,7 +6,7 @@
 
 function Money(amount) {
   var checkAmt = /^\s*\d+\s*$/;
-  if (!checkAmt.test(amount)) { error("Money must be in numerical form."); } else { this.amount = amount; }
+  if (!checkAmt.test(amount)) { Ordrin._errs.push("validation", "money"); } else { this.amount = amount; }
 }
 
 Money.prototype.ordrin_convertForAPI = function() {
