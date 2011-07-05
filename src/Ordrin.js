@@ -4,7 +4,7 @@
  *
  * Copyright 2011
  *
- * Last updated: Monday, Jun 27
+ * Last updated: Tuesday, July 5
  *
  * BIG OBJECT: ordrin.js
  *    Ordrin.r (restaurants)
