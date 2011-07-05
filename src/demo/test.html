@@ -19,13 +19,13 @@
   <script type="text/javascript" src="jquery.json2html/jquery.json2html-2.0-min.js"></script>
   
   <script type="text/javascript">
-  // Ordrin.initialize("iqR9QxyZ4BGaRMJBVL260g", "localhost:8001"); // if testing restaurant API
-  try { Ordrin.initialize("shds1d6c4BGDGs8", "localhost:8001"); } catch (err) { console.log(err); }// if testing user API
+  try { Ordrin.initialize("iqR9QxyZ4BGaRMJBVL260g", "localhost:8001"); } catch (err) { console.log(err); } // if testing restaurant API
+  //try { Ordrin.initialize("shds1d6c4BGDGs8", "localhost:8001"); } catch (err) { console.log(err); }// if testing user API
   
   function restAPISubmit() {
     try {
       switch(document.restAPIForm.func.value) {
-        case "delListwewe": {
+        case "delList": {
           if (document.restAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.restAPIForm.dT.value); }
           var place = new Address(document.restAPIForm.sA.value, "", document.restAPIForm.city.value, document.restAPIForm.zip.value);
           

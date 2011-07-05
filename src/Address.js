@@ -44,8 +44,8 @@ Address.prototype = {
   validate: function() {
     this.checkZip();
     this.checkCity();
-    this.checkState();
-    this.checkPhone();
+    if (this.state) { this.checkState(); }
+    if (this.phone) { this.checkPhone(); }
   },
 
   ordrin_convertForAPI: function() {
