@@ -26,7 +26,7 @@ Ordrin = {
     this._site = site;
     this._key = key;
     
-    if (this._errs) { throw this._errs; }
+    if (this._errs[0]) { throw this._errs; }
     
     // and if API method specified, add JSONP to append (strung into end of all queries)
     if (apiMethod) {
@@ -43,7 +43,7 @@ Ordrin = {
       var paramsURL = "";
       var userAuth = 0;
       
-      if (this._errs) { throw this._errs; }
+      if (this._errs[0]) { throw this._errs; }
       
       console.log("current user: " + Ordrin.u.currEmail + ", current password: " + Ordrin.u.currPass);
       
