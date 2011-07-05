@@ -43,6 +43,7 @@ Ordrin = {
       var paramsURL = "";
       var userAuth = 0;
       
+      if (!(this._key || this._site)) { this._errs.push(["connection", "API must be initialized before making any requests"]); }
       if (this._errs[0]) { throw this._errs; }
       
       console.log("current user: " + Ordrin.u.currEmail + ", current password: " + Ordrin.u.currPass);
@@ -190,7 +191,7 @@ Ordrin = {
     }
   },
   
-  // User API (incomplete)
+  // User API 
   u: {
     currEmail: "",
     currPass: "",

@@ -19,8 +19,8 @@
   <script type="text/javascript" src="jquery.json2html/jquery.json2html-2.0-min.js"></script>
   
   <script type="text/javascript">
-  //try { Ordrin.initialize("iqR9QxyZ4BGaRMJBVL260g", "localhost:8001", 1); } catch (err) { console.log(err); } // if testing restaurant API
-  try { Ordrin.initialize("shds1d6c4BGDGs8", "localhost:8001"); } catch (err) { console.log(err); } // if testing user API
+  try { Ordrin.initialize("iqR9QxyZ4BGaRMJBVL260g", "localhost:8001", 1); } catch (err) { console.log(err); } // if testing restaurant API
+  //try { Ordrin.initialize("shds1d6c4BGDGs8", "localhost:8001"); } catch (err) { console.log(err); } // if testing user API
   
   function restAPISubmit() {
     try {
@@ -29,7 +29,7 @@
           if (document.restAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.restAPIForm.dT.value); }
           var place = new Address(document.restAPIForm.sA.value, "", document.restAPIForm.city.value, document.restAPIForm.zip.value);
           
-          Ordrin.r.deliveryList(time, place, feed);
+          Ordrin.r.deliveryList(time, place, "feed");
         } break;
         case "delCheck": {
           if (document.restAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.restAPIForm.dT.value); }
@@ -86,8 +86,6 @@
   }}]
 
   function feed(data) {
-    if (!data) { Ordrin._error("No response."); }
-    if (data["error"]) { Ordrin._error(data["msg"]); }
     $("#jsonOutput").json2html(data, transform);// document.getElementById('jsonOutput').innerHTML = JSON.stringify(data);
   }
   
