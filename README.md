@@ -11,8 +11,8 @@ Usage
         var time = new Date(); // uses Javascript's built-in Date object
         time.setASAP(); // overrides Date properties to ASAP
         var place = new Address(street, street2 [optional], city, zip, state [optional], phone [optional]);
-	Address.checkZip();
-	Address.checkPhone();
+        Address.checkZip();
+        Address.checkPhone();
 	Address.validate() // runs all checks
         
         var subtotal = new Money("100");
@@ -23,17 +23,17 @@ Usage
         Ordrin.r.deliveryFee(restaurantID, subtotal, tip, time, place, callbackFunction);
         Ordrin.r.details(restaurantID, callbackFunction);
 
-	Ordrin.u.makeAcct(email, password, firstName, lastName, callbackFunction);
-	Ordrin.u.setCurrAcct(email, password, callbackFunction); // set user account currently in use or "logged in"
-	Ordrin.u.getAcct(callbackFunction); // get details on current user
-	Ordrin.u.getAddress(addressNickname, callbackFunction);
-	Ordrin.u.updateAddress(address, callbackFunction); // Address must be passed using API's built-in Address object
-	Ordrin.u.deleteAddress(addressNickname, callbackFunction);
-	Ordrin.u.getCard(cardNickname, callbackFunction);
-	Ordrin.u.updateCard(cardNickname, nameOnCard, cardNumber, cardSecurityCode, expiryMonth, expiryYear, billAddress, callbackFunction);
-	Ordrin.u.deleteCard(cardNickname, callbackFunction);
-	Ordrin.u.orderHistory(orderID, callbackFunction); // if orderID left blank, all previous orders returned; ID returns specific details of order
-	Ordrin.u.updatePassword(newPassword, callbackFunction);
+        Ordrin.u.makeAcct(email, password, firstName, lastName, callbackFunction);
+        Ordrin.u.setCurrAcct(email, password, callbackFunction); // set user account currently in use or "logged in"
+        Ordrin.u.getAcct(callbackFunction); // get details on current user
+        Ordrin.u.getAddress(addressNickname, callbackFunction);
+        Ordrin.u.updateAddress(address, callbackFunction); // Address must be passed using API's built-in Address object
+        Ordrin.u.deleteAddress(addressNickname, callbackFunction);
+        Ordrin.u.getCard(cardNickname, callbackFunction);
+        Ordrin.u.updateCard(cardNickname, nameOnCard, cardNumber, cardSecurityCode, expiryMonth, expiryYear, billAddress, callbackFunction);
+        Ordrin.u.deleteCard(cardNickname, callbackFunction);
+        Ordrin.u.orderHistory(orderID, callbackFunction); // if orderID left blank, all previous orders returned; ID returns specific details of order
+        Ordrin.u.updatePassword(newPassword, callbackFunction);
 
 
 Notes
