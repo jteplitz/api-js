@@ -13,7 +13,7 @@ Usage
         var place = new Address(street, street2 [optional], city, zip, state [optional], phone [optional]);
         Address.checkZip();
         Address.checkPhone();
-	Address.validate() // runs all checks
+        Address.validate() // runs all checks
         
         var subtotal = new Money("100");
         var tip = new Money("15");
