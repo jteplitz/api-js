@@ -85,6 +85,9 @@ Ordrin = {
       } else { 
         appends.push(["jsonp", func]);
         
+        var cx = new Date();
+        appends.push(["_cx", cx.getTime()]);
+        
         switch (api) {
           case "uP": appends.push(["_method", "POST"]); api = "u"; break;
           case "uPu": appends.push(["_method", "PUT"]); api = "u"; break;
@@ -172,7 +175,7 @@ Ordrin = {
       document.body._appendChild(form);
       form.submit();*/
       
-      //_apiRequest("o", "o", restID, tray, tip, dTime.date, dTime.time, user.firstName, user.lastName, user.addr.street, user.addr.city, user.addr.state, user.addr.zip, user.addr.phone, username/email, ccs_nameOnIt, ccs_number, ccs_expiry, ccs_billaddr.1, ccs_billaddr.2, ccs_city, ccs_state, ccs_zip);
+      //_apiRequest("o", "o", restID, tray, tip, dTime.getMonth() + "-" + dTime.getDate(), dTime.get, user.firstName, user.lastName, user.addr.street, user.addr.city, user.addr.state, user.addr.zip, user.addr.phone, username/email, ccs_nameOnIt, ccs_number, ccs_expiry, ccs_billaddr.1, ccs_billaddr.2, ccs_city, ccs_state, ccs_zip);
     }
   },
   
