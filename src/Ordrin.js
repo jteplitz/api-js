@@ -82,7 +82,7 @@ Ordrin = {
         this._xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         
         if(outForm) { this._xmlhttp.send(outForm); } else { this._xmlhttp.send(); }
-      } else {
+      } else { 
         appends.push(["jsonp", func]);
         
         switch (api) {
@@ -153,7 +153,7 @@ Ordrin = {
   
   // Order API (incomplete)
   o: {
-    submit: function(restaurantID, params) {
+    submit: function(restID, tray, tip, dTime, ccs) {
       // using a hidden form to submit the order via POST
       /* var form = document.createElement("form");
       form.setAttribute("method", "POST");
@@ -172,7 +172,7 @@ Ordrin = {
       document.body._appendChild(form);
       form.submit();*/
       
-      _apiRequest("o", "o", restaurantID, params);
+      //_apiRequest("o", "o", restID, tray, tip, dTime.date, dTime.time, user.firstName, user.lastName, user.addr.street, user.addr.city, user.addr.state, user.addr.zip, user.addr.phone, username/email, ccs_nameOnIt, ccs_number, ccs_expiry, ccs_billaddr.1, ccs_billaddr.2, ccs_city, ccs_state, ccs_zip);
     }
   },
   
@@ -202,7 +202,7 @@ Ordrin = {
       Ordrin._apiRequest("uD", "u", func, this.currEmail, "addrs", nickname);
     },
     getCard: function(nickname, func) {
-      if (nickname) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "ccs", nickname); } else { Ordrin._apiRequest("uG", "u", func, 2, this.currEmail, "ccs"); }
+      if (nickname) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "ccs", nickname); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "ccs"); }
     },
     updateCard: function(nickname, name, number, cvc, expiryMonth, expiryYear, addr, func) {   
       addr.validate();
@@ -212,7 +212,7 @@ Ordrin = {
       Ordrin._apiRequest("uD", "u", func, this.currEmail, "ccs", nickname);
     },
     orderHistory: function(orderID, func) {
-      if (orderID) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "order", orderID); } else { Ordrin._apiRequest("uG", "u", func, 2, this.currEmail, "orders"); }
+      if (orderID) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "order", orderID); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "orders"); }
     },
     updatePassword: function(password, func) {
       Ordrin._apiRequest("uPu", "u", func, this.currEmail, "password", "password=" + ordrin_SHA256(password));
