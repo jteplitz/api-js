@@ -192,7 +192,7 @@ Ordrin = {
       Ordrin._apiRequest("uG", "u", func, this.currEmail);
     },
     getAddress: function(nickname, func) {
-      if (nickname) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "addrs", nickname); } else { Ordrin._apiRequest("uG", "u", func, 2, this.currEmail, "addrs"); }
+      if (nickname) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "addrs", nickname); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "addrs"); }
     },
     updateAddress: function(addr, func) {
       addr.validate();
