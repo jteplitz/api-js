@@ -13,11 +13,11 @@
 function Address(street, street2, city, zip, state, phone, nick) { // last three arguments optional w/ Restaurant API in particular
   this.nick = nick;
   this.street = street.split(" ").join("+");
-  if (street2) { this.street2 = street2.split(" ").join("+"); }
+  if (street2) { this.street2 = street2.split(" ").join("+"); } else { this.street2 = ""; }
   this.city = city.split(" ").join("+");
   this.zip = zip;
   this.state = state;
-  this.phone = phone;
+  if (phone) { this.phone = phone; } else { this.phone = ""; }
 }
 
 Address.prototype = {
@@ -32,7 +32,7 @@ Address.prototype = {
   },
   
   checkCity: function() {
-    var cityRegex = /[A-Za-z]/;
+    var cityRegex = /[A-Za-z.-]/;
     if (!cityRegex.test(this.city)) Ordrin._errs.push("validation - address", "city");
   },
   

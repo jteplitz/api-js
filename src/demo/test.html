@@ -83,6 +83,26 @@
     } catch (err) { console.log(err); }
   }
   
+  function orderAPISubmit() {
+    try {
+      var place = new Address(document.orderAPIForm.sA.value, document.orderAPIForm.sA2.value, document.orderAPIForm.city.value, document.orderAPIForm.zip.value, document.orderAPIForm.state.value, document.orderAPIForm.phone.value);
+      
+      var tip = new Money(document.orderAPIForm.tip.value);
+      
+      if (document.orderAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else {
+        var time = new Date(document.orderAPIForm.dT.value);
+      }
+        var month = time.getMonth();
+        if (month < 10) { month = "0" + month; } 
+        var day = time.getDate();
+        if (day < 10) { day = "0" + day; }
+        var minutes = time.getMinutes();
+        if (minutes < 10) { minutes = "0" + minutes; }
+        
+      Ordrin.o.submit(document.orderAPIForm.restID.value, document.orderAPIForm.tray.value, tip.ordrin_convertForAPI(), /*month + "-" + day, time.getHours() + ":" + minutes*/ "ASAP", document.orderAPIForm.email.value, document.orderAPIForm.firstName.value, document.orderAPIForm.lastName.value, place.street, place.city, place.state, place.zip, place.phone, document.orderAPIForm.firstName.value + " " + document.orderAPIForm.lastName.value, document.orderAPIForm.cardNum.value, document.orderAPIForm.cvc.value, document.orderAPIForm.expMonth.value + "/" + document.orderAPIForm.expYear.value, place.street, place.street2, place.city, place.state, place.zip, "RES", "feed");
+    } catch (err) { console.log(err); }
+  }
+  
   var transform = [{"tag":"div","html":function(obj) {
     if (obj.id) { var id = obj.id; } else if (obj.rid) { var id = obj.rid; } else if (obj.em) { var id = obj.em; } else if (obj.name) { var id = obj.name; } else { var id = obj.msg; } // set identifier as ID, restaurant ID, or name returned
     return("<b>" + id + "</b>: " + JSON.stringify(obj)); // generate list of JSON data returned
@@ -95,6 +115,7 @@
   function showForm(form) {
     document.restAPIForm.setAttribute('style', 'display:none');
     document.userAPIForm.setAttribute('style', 'display:none');
+    document.orderAPIForm.setAttribute('style', 'display:none');
 
     document.getElementById('jsonOutput').innerHTML = "";
     
@@ -217,7 +238,7 @@
     background-color:#f4f4ef;
     overflow: auto;
   }
-  #initialU, #initialR, #restAPIForm, #userAPIForm, #orderAPIForm, #initialO {
+  #initialU, #initialR, #restAPIForm, #userAPIForm, #orderAPIForm {
     display:none;
   }
 </style>
@@ -230,12 +251,13 @@
 
 <div id="menu"> 
   <a href="#restAPI" onclick="showForm('restAPIForm');">Restaurant API</a><br />
-  <a href="#userAPI" onclick="showForm('userAPIForm');">User API</a>
+  <a href="#userAPI" onclick="showForm('userAPIForm');">User API</a><br />
+  <a href="#orderAPI" onclick="showForm('orderAPIForm');">Order API</a><br />
 </div> 
  
 <div id="content"> 
   <h3>Select an API to the left and one of its functions below to begin testing.</h3>
-  <form name="restAPIForm" id="restAPIForm" action="#">
+  <form name="restAPIForm" id="restAPIForm">
     <select name="func" onchange="restAPIDisplay();">
       <option value="select">Select an API function</option>
       <option value="delList">Delivery List</option>
@@ -294,27 +316,28 @@
     Order ID: <input name="ordrID" type="text" size="4" value=""><br /><br />
     <input type="submit" onclick="userAPISubmit(); return false;"> <input type="reset"></div>
   </form>
-  <form name="orderAPIForm" id="orderAPIForm" onsubmit="return orderSubmit();">
-    <div id="initialO">
-    <input name="_auth" value!!! type=hidden>
-      
-    Restaurant ID: <input name="rest"
+  <form name="orderAPIForm" id="orderAPIForm">
+    <input name="_auth" value="1,iqR9QxyZ4BGaRMJBVL260g" type=hidden>
+    Restaurant ID: <input name="restID" type="text" size="4" value="151"><br /><br />
+
+    Tip: <input name="tip" type="text" size="3" value="10"><br />
+    Tray: <input name="tray" type="text" size="50" value="[27112][6]"><br />
+    <i>(ex: [menu item id]/[qty],[option id],[option id]+[menu item id 2]/[qty]+...</i><br /><br />
     
-      
-    Email: <input name="email" type="text" size="20" value="test0@testing.com"> <br />
-    Password: <input name="password" type="text" size="20" value="testing3"> <input name="oldPassword" type="text" size="20" value="old password (if updating)"> <br /><br />
+    Email: <input name="email" type="text" size="20" value="test0@testing.com"><br />
+    Password: <input name="password" type="text" size="20" value="testing3"><br />
     First name: <input name="firstName" type="text" size="12" value="Test"> Last name: <input name="lastName" type="text" size="12" value="Testing"><br />
-    
-    Address name (home, work, etc.): <input name="addrNick" type="text" size="10" value="Home"><br />
-    Address: <input name="sA" type="text" size="20" value="12 Main Street"> <input name="sA2" type="text" size="10" value="Suite 200"><br />
+
+    Date/time: <input name="dT" type="text" size="25" value="ASAP"><a href="javascript:NewCal('dT','mmmddyyyy',true,24)"><img src="cal.gif" width="16" height="16" border="0" alt="Pick a date"></a><br />
+
+    Address: <input name="sA" type="text" size="20" value="1 Main Street"> <input name="sA2" type="text" size="10" value=""><br />
     City: <input name="city" type="text" size="20" value="College Station"> State: <input name="state" type="text" size="2" value="TX"> ZIP: <input name="zip" type="text" size="5" value="77840"><br />
     Phone number: <input name="phone" type="text" size="10" value="6789101112"><br /><br />
     
-    Card name (personal, business, etc.): <input name="cardNick" type="text" size="10" value="Home"><br />
     Card number: <input name="cardNum" type="text" size="16" value="4111111111111111"> Security code (3 or 4 digits): <input name="cvc" type="text" size="4" value="777"><br />
-    Expiration month: <input name="expMonth" type="text" size="2" value="12"> Expiration year: <input name="expYear" type="text" size="4" value="2012"><br /><br />
-    Order ID: <input name="ordrID" type="text" size="4" value=""><br /><br />
-    <input type="submit" onclick="userAPISubmit(); return false;"> <input type="reset"></div>
+    Expiration month: <input name="expMonth" type="text" size="2" value="12"> Expiration year: <input name="expYear" type="text" size="2" value="12"><br /><br />
+
+    <input type="submit" onclick="orderAPISubmit(); return false;"> <input type="reset">
   </form>
 
   <h3>Response</h3>
