@@ -18,12 +18,14 @@ Usage
         var subtotal = new Money("100");
         var tip = new Money("15");
         
+	// Restaurant API
         Ordrin.r.deliveryList(time, place, callbackFunction);
-        Ordrin.r.deliveryCheck(restaurantID, time.convert, place, callbackFunction);
+        Ordrin.r.deliveryCheck(restaurantID, time, place, callbackFunction);
         Ordrin.r.deliveryFee(restaurantID, subtotal, tip, time, place, callbackFunction);
         Ordrin.r.details(restaurantID, callbackFunction);
 
-        Ordrin.u.makeAcct(email, password, firstName, lastName, callbackFunction);
+	// User API
+        Ordrin.u.makeAcct(email, password, firstName, lastName, callbackFunction); 
         Ordrin.u.setCurrAcct(email, password, callbackFunction); // set user account currently in use or "logged in"
         Ordrin.u.getAcct(callbackFunction); // get details on current user
         Ordrin.u.getAddress(addressNickname, callbackFunction);
@@ -34,6 +36,9 @@ Usage
         Ordrin.u.deleteCard(cardNickname, callbackFunction);
         Ordrin.u.orderHistory(orderID, callbackFunction); // if orderID left blank, all previous orders returned; ID returns specific details of order
         Ordrin.u.updatePassword(newPassword, callbackFunction);
+	
+	// Order API
+	Ordrin.o.submit(restaurantID, tray, tip, time, email, firstName, lastName, deliveryAddress, nameOnCard, cardNumber, cardSecurityCode, expiry, billAddress)
 
 
 Notes
@@ -42,5 +47,6 @@ If JSONP is being used, the name of the callback function must be passed in quot
 In the case of a reverse origin proxy being used the callback function's name is not passed as a string; it is passed as a reference and also without parentheses.
 		Ordrin.r.deliveryList(time, place, "callback_function");  // JSONP
 		Ordrin.r.deliveryList(time, place, callback_function); // reverse origin proxy present
-	
-Order API in progress.
+
+Take a peek inside src/demo/test.html for usage.
+API docs available at http://www.ordr.in/developers/api.
