@@ -22,8 +22,8 @@
   // 1 switch as last argument in initialize indicates whether or not JSONP is being used!
   // If JSONP is being used, be sure that the callback function referenced in the API is enclosed in quotation marks! ("")
   
-  //try { Ordrin.initialize("iqR9QxyZ4BGaRMJBVL260g", "localhost:8001", 1); } catch (err) { console.log(err); } // if testing restaurant API
-  try { Ordrin.initialize("shds1d6c4BGDGs8", "localhost:8001", 1); } catch (err) { console.log(err); } // if testing user API
+  // try { Ordrin.initialize("iqR9QxyZ4BGaRMJBVL260g", "http://localhost:8001", 1); } catch (err) { console.log(err); } // if testing restaurant API
+  try { Ordrin.initialize("shds1d6c4BGDGs8", "http://localhost:8001", 1); } catch (err) { console.log(err); } // if testing user API
   
   function restAPISubmit() {
     try {
@@ -86,20 +86,10 @@
   function orderAPISubmit() {
     try {
       var place = new Address(document.orderAPIForm.sA.value, document.orderAPIForm.sA2.value, document.orderAPIForm.city.value, document.orderAPIForm.zip.value, document.orderAPIForm.state.value, document.orderAPIForm.phone.value);
-      
       var tip = new Money(document.orderAPIForm.tip.value);
+      if (document.orderAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.orderAPIForm.dT.value); }
       
-      if (document.orderAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else {
-        var time = new Date(document.orderAPIForm.dT.value);
-      }
-        var month = time.getMonth();
-        if (month < 10) { month = "0" + month; } 
-        var day = time.getDate();
-        if (day < 10) { day = "0" + day; }
-        var minutes = time.getMinutes();
-        if (minutes < 10) { minutes = "0" + minutes; }
-        
-      Ordrin.o.submit(document.orderAPIForm.restID.value, document.orderAPIForm.tray.value, tip.ordrin_convertForAPI(), /*month + "-" + day, time.getHours() + ":" + minutes*/ "ASAP", document.orderAPIForm.email.value, document.orderAPIForm.firstName.value, document.orderAPIForm.lastName.value, place.street, place.city, place.state, place.zip, place.phone, document.orderAPIForm.firstName.value + " " + document.orderAPIForm.lastName.value, document.orderAPIForm.cardNum.value, document.orderAPIForm.cvc.value, document.orderAPIForm.expMonth.value + "/" + document.orderAPIForm.expYear.value, place.street, place.street2, place.city, place.state, place.zip, "RES", "feed");
+      Ordrin.o.submit(document.orderAPIForm.restID.value, document.orderAPIForm.tray.value, tip.ordrin_convertForAPI(), time, document.orderAPIForm.email.value, document.orderAPIForm.firstName.value, document.orderAPIForm.lastName.value, place, document.orderAPIForm.firstName.value + " " + document.orderAPIForm.lastName.value, document.orderAPIForm.cardNum.value, document.orderAPIForm.cvc.value, document.orderAPIForm.expMonth.value + "/" + document.orderAPIForm.expYear.value, place);
     } catch (err) { console.log(err); }
   }
   
@@ -318,10 +308,10 @@
   </form>
   <form name="orderAPIForm" id="orderAPIForm">
     <input name="_auth" value="1,iqR9QxyZ4BGaRMJBVL260g" type=hidden>
-    Restaurant ID: <input name="restID" type="text" size="4" value="151"><br /><br />
+    Restaurant ID: <input name="restID" type="text" size="4" value="154"><br /><br />
 
     Tip: <input name="tip" type="text" size="3" value="10"><br />
-    Tray: <input name="tray" type="text" size="50" value="[27112][6]"><br />
+    Tray: <input name="tray" type="text" size="50" value="[29003][3]"><br />
     <i>(ex: [menu item id]/[qty],[option id],[option id]+[menu item id 2]/[qty]+...</i><br /><br />
     
     Email: <input name="email" type="text" size="20" value="test0@testing.com"><br />

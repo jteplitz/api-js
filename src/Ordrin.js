@@ -9,18 +9,18 @@
 
 Ordrin = {
   _apiMethod: "", // whether a reverse origin proxy or JSONP will be used to access API
-  _site: "", // domain at which API instance is being run
+  _site: "", // domain at which API is grabbed from (either own with reverse origin proxy or Ordrin URL if JSONP used)
   _key: "", // API developer key
   _errs: [], // error array pushed into and thrown at end of errors
   
-  initialize: function(key, site, apiMethod) {
+  initialize: function(key, site, apiMethod, apiLoc) {
     // establish the developer key and site used
     if (!key) { this._errs.push(["connection", "API key required"]); }
     if (!site) { this._errs.push(["connection", "no site provided"]); }
     this._site = site;
     this._key = key;
     this._apiMethod = apiMethod;
-    
+
     if (this._errs[0]) { throw this._errs; }
     
     // and if API method is not specified, default to XHR
@@ -44,7 +44,6 @@ Ordrin = {
       for (var i = 3; i < arguments.length; i++) {
         if (!/[=]/.test(arguments[i])) {
           paramsURL = paramsURL + "/" + arguments[i]; 
-          console.log(paramsURL);
         } else {
           arguments[i].split(" ").join("+");
           outForm.push(arguments[i].split("="));
@@ -55,9 +54,15 @@ Ordrin = {
       console.log("api: " + api + ", request: " + request + ", paramsURL: " + paramsURL);
       
       if (this._xmlhttp) { // reverse origin proxy method
-        var url = "http://" + this._site + "/" + request + paramsURL; // + Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
+        var url = this._site + "/" + request + paramsURL; // + Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
         console.log("url: " + url);
         
+        for (var i = 0; i < outForm.length; i++) {
+          outForm[i] = outForm[i].join("=");
+        }
+        
+        outForm = outForm.join("&");
+  
         // set what kind of connection is being made based on API (user API split into a get, post, delete, put components)
         switch (api) {
           case "r": this._xmlhttp.open("GET",url,true); break;
@@ -68,16 +73,15 @@ Ordrin = {
           case "uD": this._xmlhttp.open("DELETE",url,true); userAuth = 1; break;
         }
         
-        // feed data into callback function
-        this._xmlhttp.onreadystatechange = function() { if(this.readyState==4 && this.status==200) { func(this.responseText); console.log("response: " + this.responseText);} };
+        if (api != "o" && func) {
+          // feed data into callback function
+          this._xmlhttp.onreadystatechange = function() { if(this.readyState==4 && this.status==200) { func(this.responseText); console.log("response: " + this.responseText);} };
+        }
         // set developer key header
         this._xmlhttp.setRequestHeader("X-NAAMA-CLIENT-AUTHENTICATION", 'id="' + this._key + '", version="1"');
         // generate header if needed in certain User API requests
         if (userAuth) {
-          console.log('uri: /' + request + paramsURL);
           var hashcode = ordrin_SHA256(ordrin_SHA256(Ordrin.u.currPass) + Ordrin.u.currEmail + "/" + request + paramsURL);
-          console.log("SHA pass: " + ordrin_SHA256(Ordrin.u.currPass));
-          console.log("whole hash: " + hashcode);
           this._xmlhttp.setRequestHeader("X-NAAMA-AUTHENTICATION", 'username="' + Ordrin.u.currEmail + '", response="' + hashcode + '", version="1"');
         }
         this._xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -100,10 +104,6 @@ Ordrin = {
         if (userAuth) {
           var hashcode = ordrin_SHA256(ordrin_SHA256(Ordrin.u.currPass) + Ordrin.u.currEmail + "/" + request + paramsURL);
           
-          console.log('uri: /' + request + paramsURL);
-          console.log("SHA pass: " + ordrin_SHA256(Ordrin.u.currPass));
-          console.log("whole hash: " + hashcode);
-          
           appends.push(["_uauth=1," + Ordrin.u.currEmail + "," + hashcode]);
         }
         
@@ -123,8 +123,8 @@ Ordrin = {
         if (outForm) { _append += "&" + outForm.join("&"); } // no need for extra & unless form data included in query
         
         // submission time
-        //var url = "https://" + api + "-test.ordr.in/" + request + paramsURL + _append; 
-        var url = "http://nn2.deasil.com/" + request + paramsURL + _append;
+        // var url = "https://" + api + "-test.ordr.in/" + request + paramsURL + _append; 
+        var url = this._site + "/" + request + paramsURL + _append;
         console.log("url: " + url);
         if(document.getElementById('jsonp')) { document.getElementById('jsonp').parentNode.removeChild(document.getElementById('jsonp')); } // clean up any previous scripts injected into head
         
@@ -146,19 +146,19 @@ Ordrin = {
     deliveryList: function(dTime, addr, func) {
       addr.validate(); 
       
-      Ordrin._apiRequest("r", "dl", func, dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI("r"));
+      Ordrin._apiRequest("r", "dl", func, dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI());
     },
     deliveryCheck: function(restID, dTime, addr, func) {
       addr.validate();
       if (!this.checkNums.test(restID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
       
-      Ordrin._apiRequest("r", "dc", func, restID, dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI("r"));
+      Ordrin._apiRequest("r", "dc", func, restID, dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI());
     },
     deliveryFee: function(restID, subtotal, tip, dTime, addr, func) {
       addr.validate(); 
       if (!this.checkNums.test(restID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
 
-      Ordrin._apiRequest("r", "fee", func, restID, subtotal.ordrin_convertForAPI(), tip.ordrin_convertForAPI(), dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI("r"));
+      Ordrin._apiRequest("r", "fee", func, restID, subtotal.ordrin_convertForAPI(), tip.ordrin_convertForAPI(), dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI());
     },
     details: function(restaurantID, func) {
       if (!this.checkNums.test(restaurantID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
@@ -167,37 +167,132 @@ Ordrin = {
     }
   },
   
-  // Order API (incomplete)
+  // Order API (somewhat hackishly interfaces to Ordrin API -- to be refined with V2)
   o: {
-    submit: function(restaurantID, tray, tip, delivery_date, /*delivery_time,*/ em, first_name, last_name, addr, city, state, zip, phone, card_name, card_number, card_cvc, card_expiry, card_bill_addr, card_bill_addr2, card_bill_city, card_bill_state, card_bill_zip, type, func) {
+    submit: function(restaurantID, tray, tip, dTime, em, first_name, last_name, addr, card_name, card_number, card_cvc, card_expiry, ccAddr) {
       if (Ordrin._apiMethod) {
         // using a hidden form to submit the order via POST without reverse origin proxy
         var form = document.createElement("form");
         form.setAttribute("method", "POST");
-        form.setAttribute("action", "http://nn2.deasil.com/o/" + restaurantID + "?jsonp=feed");
-      
-        var argNames = ["restaurantID", "tray", "tip", "delivery_date", /*"delivery_time",*/ "em", "first_name", "last_name", "addr", "city", "state", "zip", "phone", "card_name", "card_number", "card_cvc", "card_expiry", "card_bill_addr", "card_bill_addr2", "card_bill_city", "card_bill_state", "card_bill_zip", "type"];
+        form.setAttribute("action", Ordrin._site + "/o/" + restaurantID);
+
+        var argNames = ["restaurantID", "tray", "tip", "dTime", "em", "first_name", "last_name", "addr", "card_name", "card_number", "card_cvc", "card_expiry", "ccAddr"];
 
         // adding in all parameters for order form
         for(var key in arguments) {
           var hiddenField = document.createElement("input");
           hiddenField.setAttribute("type", "hidden");
-          hiddenField.setAttribute("name", argNames[key]);
-          hiddenField.setAttribute("value", arguments[key]);
-  
+
+          switch (argNames[key]) { // if extracting data from API objects
+            case "dTime":
+              hiddenField.setAttribute("name", "delivery_date");
+              if (dTime.asap == 1) { hiddenField.setAttribute("value", "ASAP"); } else {
+                var month = arguments[key].getMonth() + 1;
+                if (month < 10) { month = "0" + month; }
+                var day = arguments[key].getDate();
+                if (day < 10) { day = "0" + day; }
+                hiddenField.setAttribute("value", month + "-" + day);
+              
+                var hiddenField2 = document.createElement("input");
+                hiddenField2.setAttribute("type", "hidden");
+                hiddenField2.setAttribute("name", "delivery_time");
+                var hours = arguments[key].getHours();
+                if (hours < 10) { hours = "0" + hours; }
+                var minutes = arguments[key].getMinutes();
+                if (minutes < 10) { minutes = "0" + minutes; }
+                hiddenField2.setAttribute("value", hours + ":" + minutes);
+                form.appendChild(hiddenField2);
+              }
+            break;
+            case "addr":
+              hiddenField.setAttribute("name", "addr");
+              hiddenField.setAttribute("value", arguments[key].street);
+              
+              var hiddenField2 = document.createElement("input");
+              hiddenField2.setAttribute("type", "hidden");
+              hiddenField2.setAttribute("name", "city");
+              hiddenField2.setAttribute("value", arguments[key].city);
+              form.appendChild(hiddenField2);
+              
+              var hiddenField3 = document.createElement("input");
+              hiddenField3.setAttribute("type", "hidden");
+              hiddenField3.setAttribute("name", "state");
+              hiddenField3.setAttribute("value", arguments[key].state);
+              form.appendChild(hiddenField3);
+              
+              var hiddenField4 = document.createElement("input");
+              hiddenField4.setAttribute("type", "hidden");
+              hiddenField4.setAttribute("name", "zip");
+              hiddenField4.setAttribute("value", arguments[key].zip);
+              form.appendChild(hiddenField4);
+              
+              var hiddenField5 = document.createElement("input");
+              hiddenField5.setAttribute("type", "hidden");
+              hiddenField5.setAttribute("name", "phone");
+              hiddenField5.setAttribute("value", arguments[key].phone);
+              form.appendChild(hiddenField5);
+            break;
+            case "ccAddr":
+              hiddenField.setAttribute("name", "card_bill_addr");
+              hiddenField.setAttribute("value", arguments[key].street);
+              
+              var hiddenField2 = document.createElement("input");
+              hiddenField2.setAttribute("type", "hidden");
+              hiddenField2.setAttribute("name", "card_bill_addr2");
+              hiddenField2.setAttribute("value", arguments[key].street2);
+              form.appendChild(hiddenField2);
+              
+              var hiddenField3 = document.createElement("input");
+              hiddenField3.setAttribute("type", "hidden");
+              hiddenField3.setAttribute("name", "card_bill_city");
+              hiddenField3.setAttribute("value", arguments[key].city);
+              form.appendChild(hiddenField3);
+              
+              var hiddenField4 = document.createElement("input");
+              hiddenField4.setAttribute("type", "hidden");
+              hiddenField4.setAttribute("name", "card_bill_state");
+              hiddenField4.setAttribute("value", arguments[key].state);
+              form.appendChild(hiddenField4);
+              
+              var hiddenField5 = document.createElement("input");
+              hiddenField5.setAttribute("type", "hidden");
+              hiddenField5.setAttribute("name", "card_bill_zip");
+              hiddenField5.setAttribute("value", arguments[key].zip);
+              form.appendChild(hiddenField5);
+            break;
+            default:
+              hiddenField.setAttribute("name", argNames[key]);
+              hiddenField.setAttribute("value", arguments[key]);
+            break;
+          }
+
           form.appendChild(hiddenField);
         }
-  
+        
+        hiddenFieldType = document.createElement("input");
+        hiddenFieldType.setAttribute("type", "hidden");
+        hiddenFieldType.setAttribute("name", "type");
+        hiddenFieldType.setAttribute("value", "RES");
+        form.appendChild(hiddenFieldType);
+        
         document.body.appendChild(form);
         form.submit();
       } else {
-        // nice and easy with a reverse origin proxy
-        var month = time.getMonth();
-        if (month < 10) { month = "0" + month; } 
-        var day = time.getDate();
-        if (day < 10) { day = "0" + day; }
-      
-        Ordrin._apiRequest("o", "o", func, restaurantID, "tray=" + tray, "tip=" + tip, "delivery_date=" + delivery_date, "delivery_time=" + delivery_time, "first_name=" + firstName, "last_name=" + lastName, "addr=" + addr, "city=" + city, "state=" + state, "zip=" + zip, "phone=" + phone, "em=" + em, "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + card_bill_addr, "card_bill_addr2=" + card_bill_addr, "card_bill_city=" + card_bill_city, "card_bill_state=" + card_bill_state, "card_bill_zip=" + card_bill_zip);
+        if (dTime.asap == 1) { date = "ASAP"; time = ""; } else {
+          var month = dTime.getMonth() + 1;
+          if (month < 10) { month = "0" + month; }
+          var day = dTime.getDate();
+          if (day < 10) { day = "0" + day; }
+          date = month + "-" + day;
+  
+          var hours = dTime.getHours();
+          if (hours < 10) { hours = "0" + hours; }
+          var minutes = dTime.getMinutes();
+          if (minutes < 10) { minutes = "0" + minutes; }
+          time = hours + ":" + minutes;
+        }
+
+        Ordrin._apiRequest("o", "o", "", restaurantID, "tray=" + tray, "tip=" + tip, "delivery_date=" + date, "delivery_time=" + time, "first_name=" + first_name, "last_name=" + last_name, "addr=" + addr.street, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone, "em=" + em, "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + ccAddr.street, "card_bill_addr2=" + ccAddr.street2, "card_bill_city=" + ccAddr.city, "card_bill_state=" + ccAddr.state, "card_bill_zip=" + ccAddr.zip, "type=RES");
       }
     }
   },
