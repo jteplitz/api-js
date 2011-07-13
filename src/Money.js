@@ -5,10 +5,9 @@
 */
 
 function Money(amount) {
-  var checkAmt = /^\s*\d+\s*$/;
-  if (!checkAmt.test(amount)) { Ordrin._errs.push("validation", "money"); } else { this.amount = amount; }
+  if (isNaN(parseFloat(amount))) { Ordrin._errs.push("validation - money must be numerical"); } else { this.amount = amount; }
 }
 
 Money.prototype.ordrin_convertForAPI = function() {
-  return parseInt(this.amount) * 100;
+  return parseFloat(this.amount) * 100;
 }

@@ -15,8 +15,8 @@ Ordrin = {
   
   initialize: function(key, site, apiMethod, apiLoc) {
     // establish the developer key and site used
-    if (!key) { this._errs.push(["connection", "API key required"]); }
-    if (!site) { this._errs.push(["connection", "no site provided"]); }
+    if (!key) { this._errs.push("connection - API key required"); }
+    if (!site) { this._errs.push("connection - no site provided"); }
     this._site = site;
     this._key = key;
     this._apiMethod = apiMethod;
@@ -36,7 +36,7 @@ Ordrin = {
       
       // you shall not pass
       if (!(this._key || this._site)) { this._errs.push(["connection", "API must be initialized before making any requests"]); }
-      if (this._errs[0]) { throw this._errs; }
+      if (this._errs[0]) { _errscopy = this._errs; this._errs = []; throw _errscopy; }
       
       console.log("current user: " + Ordrin.u.currEmail + ", current password: " + Ordrin.u.currPass);
       
@@ -102,6 +102,7 @@ Ordrin = {
         
         // user authentication string required for certain requests added into query
         if (userAuth) {
+          if (!(Ordrin.u.currEmail || Ordrin.u.currPass)) { Ordrin._errs.push(["initialization", "cannot access user API without setting up current account (user and pass) with u.setCurrAcct"]); throw Ordrin._errs; }
           var hashcode = ordrin_SHA256(ordrin_SHA256(Ordrin.u.currPass) + Ordrin.u.currEmail + "/" + request + paramsURL);
           
           appends.push(["_uauth=1," + Ordrin.u.currEmail + "," + hashcode]);
@@ -144,33 +145,70 @@ Ordrin = {
     checkNums: /^\s*\d+\s*$/,
     
     deliveryList: function(dTime, addr, func) {
+      
+      if (!(dTime instanceof Date)) { Ordrin._errs.push("argument type - date provided must be provided as Date object (standard JS object)"); }
+      if (!(addr instanceof Address)) { Ordrin._errs.push("argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
+      for (var i=0;i<3;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
       addr.validate(); 
       
       Ordrin._apiRequest("r", "dl", func, dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI());
     },
-    deliveryCheck: function(restID, dTime, addr, func) {
+    deliveryCheck: function(restID, dTime, addr, func) {   
+      if (!(dTime instanceof Date)) { Ordrin._errs.push("argument type - date provided must be provided as Date object (standard JS object)"); }
+      if (!(addr instanceof Address)) { Ordrin._errs.push("argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
+            for (var i=0;i<4;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       addr.validate();
-      if (!this.checkNums.test(restID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
+      if (!this.checkNums.test(restID)) { Ordrin._errs.push("validation - restaurant ID must be provided and numerical"); }
       
       Ordrin._apiRequest("r", "dc", func, restID, dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI());
     },
     deliveryFee: function(restID, subtotal, tip, dTime, addr, func) {
+      if (!(dTime instanceof Date)) { Ordrin._errs.push("argument type - date provided must be provided as Date object (standard JS object)"); }
+      if (!(addr instanceof Address)) { Ordrin._errs.push("argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
+      if (!(subtotal instanceof Money)) { Ordrin._errs.push("argument type - subtotal must be provided as Money object (included in Ordrin JS API)"); }
+      if (!(tip instanceof Money)) { Ordrin._errs.push("argument type - tip must be provided as Money object (included in Ordrin JS API)"); }
+      
+      for (var i=0;i<6;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       addr.validate(); 
-      if (!this.checkNums.test(restID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
-
+      if (!this.checkNums.test(restID)) { Ordrin._errs.push("validation - restaurant ID must be provided and numerical"); }
+      
+      console.log(Ordrin._errs);
       Ordrin._apiRequest("r", "fee", func, restID, subtotal.ordrin_convertForAPI(), tip.ordrin_convertForAPI(), dTime.ordrin_convertForAPI(), addr.ordrin_convertForAPI());
     },
     details: function(restaurantID, func) {
-      if (!this.checkNums.test(restaurantID)) { this._errs.push("validation", "restaurant ID must be provided and numerical"); }
-
+      if (!this.checkNums.test(restaurantID)) { Ordrin._errs.push("validation - restaurant ID must be provided and numerical"); }
+      for (var i=0;i<2;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       Ordrin._apiRequest("r", "rd", func, restaurantID);
     }
   },
   
-  // Order API (somewhat hackishly interfaces to Ordrin API -- to be refined with V2)
+  // Order API 
   o: {
-    submit: function(restaurantID, tray, tip, dTime, em, first_name, last_name, addr, card_name, card_number, card_cvc, card_expiry, ccAddr) {
+    submit: function(restaurantID, tray, tip, dTime, em, first_name, last_name, addr, card_name, card_number, card_cvc, card_expiry, ccAddr) {      
+      for (var i=0;i<12;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for submit function (no blank, null, or undefined values allowed)"); }
+      }
+      
+      if (!(tip instanceof Money)) { Ordrin._errs.push("argument type - tip must be provided as Money object (included in Ordrin JS API)"); }
+      if (!(dTime instanceof Date)) { Ordrin._errs.push("argument type - date provided must be provided as Date object (standard JS object)"); }
+      if (!(addr instanceof Address)) { Ordrin._errs.push("argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
+      if (!(ccAddr instanceof Address)) { Ordrin._errs.push("argument type - credit card address provided must be provided as Address object (included in Ordrin JS API)"); }
+      
+      
       if (Ordrin._apiMethod) {
+        if (Ordrin._errs[0]) { _errscopy = Ordrin._errs; Ordrin._errs = []; throw _errscopy; }
+        
         // using a hidden form to submit the order via POST without reverse origin proxy
         var form = document.createElement("form");
         form.setAttribute("method", "POST");
@@ -184,6 +222,7 @@ Ordrin = {
           hiddenField.setAttribute("type", "hidden");
 
           switch (argNames[key]) { // if extracting data from API objects
+            case "tip": hiddenField.setAttribute("name", "tip"); hiddenField.setAttribute("value", arguments[key].ordrin_convertForAPI()); form.appendChild(hiddenfield); break;
             case "dTime":
               hiddenField.setAttribute("name", "delivery_date");
               if (dTime.asap == 1) { hiddenField.setAttribute("value", "ASAP"); } else {
@@ -292,7 +331,7 @@ Ordrin = {
           time = hours + ":" + minutes;
         }
 
-        Ordrin._apiRequest("o", "o", "", restaurantID, "tray=" + tray, "tip=" + tip, "delivery_date=" + date, "delivery_time=" + time, "first_name=" + first_name, "last_name=" + last_name, "addr=" + addr.street, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone, "em=" + em, "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + ccAddr.street, "card_bill_addr2=" + ccAddr.street2, "card_bill_city=" + ccAddr.city, "card_bill_state=" + ccAddr.state, "card_bill_zip=" + ccAddr.zip, "type=RES");
+        Ordrin._apiRequest("o", "o", "", restaurantID, "tray=" + tray, "tip=" + tip.ordrin_convertForAPI(), "delivery_date=" + date, "delivery_time=" + time, "first_name=" + first_name, "last_name=" + last_name, "addr=" + addr.street, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone, "em=" + em, "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + ccAddr.street, "card_bill_addr2=" + ccAddr.street2, "card_bill_city=" + ccAddr.city, "card_bill_state=" + ccAddr.state, "card_bill_zip=" + ccAddr.zip, "type=RES");
       }
     }
   },
@@ -303,39 +342,85 @@ Ordrin = {
     currPass: "",
     
     makeAcct: function(email, password, firstName, lastName, func) {
+      for (var i=0;i<5;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       Ordrin._apiRequest("uP", "u", func, email, "first_name=" + firstName, "last_name=" + lastName, "password=" + password); // password needs to be SHA encoded in later versions
     },
     setCurrAcct: function(email, password) {
+      for (var i=0;i<2;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation", "all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       this.currEmail = email;
       this.currPass = password;
     },
     getAcct: function(func) {
+      for (var i=0;i<1;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       Ordrin._apiRequest("uG", "u", func, this.currEmail);
     },
     getAddress: function(nickname, func) {
+      for (var i=0;i<1;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - at least one argument needed for function (callback)"); }
+      }
+      
       if (nickname) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "addrs", nickname); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "addrs"); }
     },
     updateAddress: function(addr, func) {
+      if (!(addr instanceof Address)) { Ordrin._errs.push("argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
+      for (var i=0;i<1;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       addr.validate();
       Ordrin._apiRequest("uPu", "u", func, this.currEmail, "addrs", addr.nick, "addr=" + addr.street, "addr2=" + addr.street2, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone);  
     },
     deleteAddress: function(nickname, func) {
+      for (var i=0;i<2;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       Ordrin._apiRequest("uD", "u", func, this.currEmail, "addrs", nickname);
     },
     getCard: function(nickname, func) {
+      for (var i=0;i<2;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - at least one argument required for function (callback)"); }
+      }
+      
       if (nickname) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "ccs", nickname); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "ccs"); }
     },
-    updateCard: function(nickname, name, number, cvc, expiryMonth, expiryYear, addr, func) {   
+    updateCard: function(nickname, name, number, cvc, expiryMonth, expiryYear, addr, func) {
+      if (!(addr instanceof Address)) { Ordrin._errs.push("argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
+      for (var i=0;i<8;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       addr.validate();
       Ordrin._apiRequest("uPu", "u", func, this.currEmail, "ccs", nickname, "name=" + name, "number=" + number, "cvc=" + cvc, "expiry_month=" + expiryMonth, "expiry_year=" + expiryYear, "bill_addr=" + addr.street, "bill_addr2=" + addr.street2, "bill_city=" + addr.city, "bill_state=" + addr.state, "bill_zip=" + addr.zip);  
     },
     deleteCard: function(nickname, func) {
+      for (var i=0;i<2;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+      }
+      
       Ordrin._apiRequest("uD", "u", func, this.currEmail, "ccs", nickname);
     },
     orderHistory: function(orderID, func) {
+      for (var i=0;i<1;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - at least one argument required for function (callback)"); }
+      }
+      
       if (orderID) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "order", orderID); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "orders"); }
     },
     updatePassword: function(password, func) {
+      for (var i=0;i<2;i++) {
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed"); }
+      }
+      
       Ordrin._apiRequest("uPu", "u", func, this.currEmail, "password", "password=" + ordrin_SHA256(password));
       this.currPass = password;
     }

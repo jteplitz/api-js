@@ -30,6 +30,6 @@ Date.prototype.setASAP = function() {
 Date.prototype.ordrin_validate = function() {
   if (!this.asap) {
     oiNow = new Date();
-    if (this.getTime() < oiNow.getTime()) Ordrin._errs.push("validation", "date/time cannot be in past");
+    if (this.getTime() < oiNow.getTime()) { Ordrin._errs.push("validation - date/time cannot be in past"); }
   }
 }
