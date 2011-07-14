@@ -36,7 +36,7 @@ Ordrin = {
       
       // you shall not pass
       if (!(this._key || this._site)) { this._errs.push(["connection", "API must be initialized before making any requests"]); }
-      if (this._errs[0]) { _errscopy = this._errs; this._errs = []; throw _errscopy; }
+      if (this._errs[0]) { var _errscopy = this._errs; this._errs = []; throw _errscopy; }
       
       console.log("current user: " + Ordrin.u.currEmail + ", current password: " + Ordrin.u.currPass);
       
@@ -195,7 +195,7 @@ Ordrin = {
   
   // Order API 
   o: {
-    submit: function(restaurantID, tray, tip, dTime, em, first_name, last_name, addr, card_name, card_number, card_cvc, card_expiry, ccAddr) {      
+    submit: function(restaurantID, tray, tip, dTime, em, first_name, last_name, addr, card_name, card_number, card_cvc, card_expiry, ccAddr, success_url, fail_url) {      
       for (var i=0;i<12;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for submit function (no blank, null, or undefined values allowed)"); }
       }
@@ -214,7 +214,7 @@ Ordrin = {
         form.setAttribute("method", "POST");
         form.setAttribute("action", Ordrin._site + "/o/" + restaurantID);
 
-        var argNames = ["restaurantID", "tray", "tip", "dTime", "em", "first_name", "last_name", "addr", "card_name", "card_number", "card_cvc", "card_expiry", "ccAddr"];
+        var argNames = ["restaurantID", "tray", "tip", "dTime", "em", "first_name", "last_name", "addr", "card_name", "card_number", "card_cvc", "card_expiry", "ccAddr", "success_url", "fail_url"];
 
         // adding in all parameters for order form
         for(var key in arguments) {
@@ -222,7 +222,7 @@ Ordrin = {
           hiddenField.setAttribute("type", "hidden");
 
           switch (argNames[key]) { // if extracting data from API objects
-            case "tip": hiddenField.setAttribute("name", "tip"); hiddenField.setAttribute("value", arguments[key].ordrin_convertForAPI()); form.appendChild(hiddenfield); break;
+            case "tip": hiddenField.setAttribute("name", "tip"); hiddenField.setAttribute("value", arguments[key].ordrin_convertForAPI()); form.appendChild(hiddenField); break;
             case "dTime":
               hiddenField.setAttribute("name", "delivery_date");
               if (dTime.asap == 1) { hiddenField.setAttribute("value", "ASAP"); } else {
@@ -331,7 +331,7 @@ Ordrin = {
           time = hours + ":" + minutes;
         }
 
-        Ordrin._apiRequest("o", "o", "", restaurantID, "tray=" + tray, "tip=" + tip.ordrin_convertForAPI(), "delivery_date=" + date, "delivery_time=" + time, "first_name=" + first_name, "last_name=" + last_name, "addr=" + addr.street, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone, "em=" + em, "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + ccAddr.street, "card_bill_addr2=" + ccAddr.street2, "card_bill_city=" + ccAddr.city, "card_bill_state=" + ccAddr.state, "card_bill_zip=" + ccAddr.zip, "type=RES");
+        Ordrin._apiRequest("o", "o", "", restaurantID, "tray=" + tray, "tip=" + tip.ordrin_convertForAPI(), "delivery_date=" + date, "delivery_time=" + time, "first_name=" + first_name, "last_name=" + last_name, "addr=" + addr.street, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone, "em=" + em, "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + ccAddr.street, "card_bill_addr2=" + ccAddr.street2, "card_bill_city=" + ccAddr.city, "card_bill_state=" + ccAddr.state, "card_bill_zip=" + ccAddr.zip, "success_url=" + success_url, "fail_url" + fail_url, "type=RES");
       }
     }
   },

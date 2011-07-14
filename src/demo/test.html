@@ -88,8 +88,10 @@
       var place = new Address(document.orderAPIForm.sA.value, document.orderAPIForm.sA2.value, document.orderAPIForm.city.value, document.orderAPIForm.zip.value, document.orderAPIForm.state.value, document.orderAPIForm.phone.value);
       var tip = new Money(document.orderAPIForm.tip.value);
       if (document.orderAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.orderAPIForm.dT.value); }
+      var successUrl = "http://localhost:8001/demo/test.html";
+      var failUrl = "http://localhost:8001/demo/test.html";
       
-      Ordrin.o.submit(document.orderAPIForm.restID.value, document.orderAPIForm.tray.value, tip.ordrin_convertForAPI(), time, document.orderAPIForm.email.value, document.orderAPIForm.firstName.value, document.orderAPIForm.lastName.value, place, document.orderAPIForm.firstName.value + " " + document.orderAPIForm.lastName.value, document.orderAPIForm.cardNum.value, document.orderAPIForm.cvc.value, document.orderAPIForm.expMonth.value + "/" + document.orderAPIForm.expYear.value, place);
+      Ordrin.o.submit(document.orderAPIForm.restID.value, document.orderAPIForm.tray.value, tip, time, document.orderAPIForm.email.value, document.orderAPIForm.firstName.value, document.orderAPIForm.lastName.value, place, document.orderAPIForm.firstName.value + " " + document.orderAPIForm.lastName.value, document.orderAPIForm.cardNum.value, document.orderAPIForm.cvc.value, document.orderAPIForm.expMonth.value + "/" + document.orderAPIForm.expYear.value, place, successUrl, failUrl);
     } catch (err) { console.log(err); }
   }
   
@@ -308,7 +310,7 @@
   </form>
   <form name="orderAPIForm" id="orderAPIForm">
     <input name="_auth" value="1,iqR9QxyZ4BGaRMJBVL260g" type=hidden>
-    Restaurant ID: <input name="restID" type="text" size="4" value="154"><br /><br />
+    Restaurant ID: <input name="restID" type="text" size="4" value="101"><br /><br />
 
     Tip: <input name="tip" type="text" size="3" value="10"><br />
     Tray: <input name="tray" type="text" size="50" value="[29003][3]"><br />
@@ -321,7 +323,7 @@
     Date/time: <input name="dT" type="text" size="25" value="ASAP"><a href="javascript:NewCal('dT','mmmddyyyy',true,24)"><img src="cal.gif" width="16" height="16" border="0" alt="Pick a date"></a><br />
 
     Address: <input name="sA" type="text" size="20" value="1 Main Street"> <input name="sA2" type="text" size="10" value=""><br />
-    City: <input name="city" type="text" size="20" value="College Station"> State: <input name="state" type="text" size="2" value="TX"> ZIP: <input name="zip" type="text" size="5" value="77840"><br />
+    City: <input name="city" type="text" size="20" value="College Station"> State: <input name="state" type="text" size="2" value="TX"> ZIP: <input name="zip" type="text" size="5" value="32501"><br />
     Phone number: <input name="phone" type="text" size="10" value="6789101112"><br /><br />
     
     Card number: <input name="cardNum" type="text" size="16" value="4111111111111111"> Security code (3 or 4 digits): <input name="cvc" type="text" size="4" value="777"><br />
