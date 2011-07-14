@@ -364,16 +364,14 @@ Ordrin = {
       Ordrin._apiRequest("uG", "u", func, this.currEmail);
     },
     getAddress: function(nickname, func) {
-      for (var i=0;i<1;i++) {
-        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - at least one argument needed for function (callback)"); }
-      }
+      if (typeof arguments === "undefined") { Ordrin._errs.push("validation - no arguments provided (need nickname for particular card or blank ('') to grab all in first argument, callback in second)"); }
       
       if (nickname) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "addrs", nickname); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "addrs"); }
     },
     updateAddress: function(addr, func) {
       if (!(addr instanceof Address)) { Ordrin._errs.push("argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
       for (var i=0;i<1;i++) {
-        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (no blank, null, or undefined values allowed)"); }
+        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - all arguments required for function (first as address object, second as callback)"); }
       }
       
       addr.validate();
@@ -387,9 +385,7 @@ Ordrin = {
       Ordrin._apiRequest("uD", "u", func, this.currEmail, "addrs", nickname);
     },
     getCard: function(nickname, func) {
-      for (var i=0;i<2;i++) {
-        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - at least one argument required for function (callback)"); }
-      }
+      if (typeof arguments === "undefined") { Ordrin._errs.push("validation - no arguments provided (need nickname for particular card or blank ('') to grab all in first argument, callback in second)"); }
       
       if (nickname) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "ccs", nickname); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "ccs"); }
     },
@@ -410,9 +406,7 @@ Ordrin = {
       Ordrin._apiRequest("uD", "u", func, this.currEmail, "ccs", nickname);
     },
     orderHistory: function(orderID, func) {
-      for (var i=0;i<1;i++) {
-        if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("validation - at least one argument required for function (callback)"); }
-      }
+      if (typeof arguments === "undefined") { Ordrin._errs.push("validation - no arguments provided (need order ID for particular order or blank ('') to grab all in first argument, callback in second)"); }
       
       if (orderID) { Ordrin._apiRequest("uG", "u", func, this.currEmail, "order", orderID); } else { Ordrin._apiRequest("uG", "u", func, this.currEmail, "orders"); }
     },
