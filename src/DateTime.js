@@ -5,8 +5,8 @@
  Note: ALWAYS use local time!
 */
 
-Date.prototype.ordrin_convertForAPI = function() {
-  this.ordrin_validate();
+Date.prototype._convertForAPI = function() {
+  this._validate();
   if (this.asap) { return "ASAP"; } else {
     var month = this.getMonth();
     var date = this.getDate();
@@ -27,9 +27,9 @@ Date.prototype.setASAP = function() {
   this.asap = 1;
 }
 
-Date.prototype.ordrin_validate = function() {
+Date.prototype._validate = function() {
   if (!this.asap) {
     oiNow = new Date();
-    if (this.getTime() < oiNow.getTime()) { Ordrin._errs.push("validation - date/time cannot be in past"); }
+    if (this.getTime() < oiNow.getTime()) { Ordrin._errs.push("Date object - validation - date/time cannot be in the past"); }
   }
 }

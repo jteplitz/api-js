@@ -5,9 +5,9 @@
 */
 
 function Money(amount) {
-  if (isNaN(parseFloat(amount))) { Ordrin._errs.push("validation - money must be numerical"); } else { this.amount = amount; }
+  if (isNaN(parseFloat(amount))) { Ordrin._errs.push("Money object - validation - must be numerical"); } else { this.amount = amount; }
 }
 
-Money.prototype.ordrin_convertForAPI = function() {
+Money.prototype._convertForAPI = function() {
   return parseFloat(this.amount) * 100;
 }
