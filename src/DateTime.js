@@ -7,7 +7,9 @@
 
 Date.prototype._convertForAPI = function() {
   this._validate();
-  if (this.asap) { return "ASAP"; } else {
+  if (this.asap) {
+    return "ASAP";
+  } else {
     var month = this.getMonth();
     var date = this.getDate();
     var hours = this.getHours();

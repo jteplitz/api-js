@@ -21,19 +21,35 @@
   // 1 switch as last argument in initialize indicates whether or not JSONP is being used!
   // If JSONP is being used, be sure that the callback function referenced in the API is enclosed in quotation marks! ("")
   
-  try { Ordrin.initialize("shds1d6c4BGDGs8", "http://localhost:8001", 1); } catch (err) { console.log(err); }
+  try {
+    Ordrin.initialize("shds1d6c4BGDGs8", "http://localhost:8001", 1);
+  } catch (err) {
+    console.log(err);
+  }
   
   function restAPISubmit() {
     try {
       switch(document.restAPIForm.func.value) {
         case "delList": {
-          if (document.restAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.restAPIForm.dT.value); }
+          if (document.restAPIForm.dT.value == "ASAP") {
+            var time = new Date();
+            time.setASAP();
+          } else {
+            var time = new Date(document.restAPIForm.dT.value);
+          }
+          
           var place = new Address(document.restAPIForm.sA.value, "", document.restAPIForm.city.value, document.restAPIForm.zip.value);
           
           Ordrin.r.deliveryList(time, place, "feed");
         } break;
         case "delCheck": {
-          if (document.restAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.restAPIForm.dT.value); }
+          if (document.restAPIForm.dT.value == "ASAP") {
+            var time = new Date();
+            time.setASAP();
+          } else {
+            var time = new Date(document.restAPIForm.dT.value);
+          }
+          
           var place = new Address(document.restAPIForm.sA.value, "", document.restAPIForm.city.value, document.restAPIForm.zip.value);
           
           Ordrin.r.deliveryCheck(document.restAPIForm.rID.value, time, place, "feed");
@@ -42,7 +58,13 @@
           var subtotal = new Money(document.restAPIForm.sT.value);
           var tip = new Money(document.restAPIForm.tip.value);
           
-          if (document.restAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.restAPIForm.dT.value); }
+          if (document.restAPIForm.dT.value == "ASAP") {
+            var time = new Date();
+            time.setASAP();
+          } else {
+            var time = new Date(document.restAPIForm.dT.value);
+          }
+          
           var place = new Address(document.restAPIForm.sA.value, "", document.restAPIForm.city.value, document.restAPIForm.zip.value);
           
           Ordrin.r.deliveryFee(document.restAPIForm.rID.value, subtotal, tip, time, place, "feed");
@@ -83,16 +105,34 @@
     try {
       var place = new Address(document.orderAPIForm.sA.value, document.orderAPIForm.sA2.value, document.orderAPIForm.city.value, document.orderAPIForm.zip.value, document.orderAPIForm.state.value, document.orderAPIForm.phone.value);
       var tip = new Money(document.orderAPIForm.tip.value);
-      if (document.orderAPIForm.dT.value == "ASAP") { var time = new Date(); time.setASAP(); } else { var time = new Date(document.orderAPIForm.dT.value); }
+      if (document.restAPIForm.dT.value == "ASAP") {
+        var time = new Date();
+        time.setASAP();
+      } else {
+        var time = new Date(document.restAPIForm.dT.value);
+      }
+          
       var successUrl = "http://localhost:8001/demo/test.html";
       var failUrl = "http://localhost:8001/demo/test.html";
       
       Ordrin.o.submit(document.orderAPIForm.restID.value, document.orderAPIForm.tray.value, tip, time, document.orderAPIForm.email.value, document.orderAPIForm.firstName.value, document.orderAPIForm.lastName.value, place, document.orderAPIForm.firstName.value + " " + document.orderAPIForm.lastName.value, document.orderAPIForm.cardNum.value, document.orderAPIForm.cvc.value, document.orderAPIForm.expMonth.value + "/" + document.orderAPIForm.expYear.value, place, successUrl, failUrl);
-    } catch (err) { console.log(err); }
+    } catch (err) {
+      console.log(err);
+    }
   }
   
   var transform = [{"tag":"div","html":function(obj) {
-    if (obj.id) { var id = obj.id; } else if (obj.rid) { var id = obj.rid; } else if (obj.em) { var id = obj.em; } else if (obj.name) { var id = obj.name; } else { var id = obj.msg; } // set identifier as ID, restaurant ID, or name returned
+    if (obj.id) {
+      var id = obj.id;
+    } else if (obj.rid) {
+      var id = obj.rid;
+    } else if (obj.em) {
+      var id = obj.em;
+    } else if (obj.name) {
+      var id = obj.name;
+    } else {
+      var id = obj.msg;
+    } // set identifier as ID, restaurant ID, or name returned
     return("<b>" + id + "</b>: " + JSON.stringify(obj)); // generate list of JSON data returned
   }}]
 

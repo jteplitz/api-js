@@ -5,7 +5,11 @@
 */
 
 function Money(amount) {
-  if (isNaN(parseFloat(amount))) { Ordrin._errs.push("Money object - validation - must be numerical"); } else { this.amount = amount; }
+  if (isNaN(parseFloat(amount))) {
+    Ordrin._errs.push("Money object - validation - must be numerical");
+  } else {
+    this.amount = amount;
+  }
 }
 
 Money.prototype._convertForAPI = function() {

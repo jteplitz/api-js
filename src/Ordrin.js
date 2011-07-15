@@ -39,7 +39,11 @@ Ordrin = {
       
       // validation
       if (!(this._key || this._site)) { this._errs.push("API initialization - API must be initialized before making any requests"); }
-      if (this._errs[0]) { var _errscopy = this._errs; this._errs = []; throw _errscopy; }
+      if (this._errs[0]) {
+        var _errscopy = this._errs;
+        this._errs = [];
+        throw _errscopy;
+      }
       
       // string together all params for either submission
       for (var i = 3; i < arguments.length; i++) {
@@ -71,12 +75,14 @@ Ordrin = {
           case "uD": this._xmlhttp.open("DELETE",url,true); userAuth = 1; break;
         }
         
+        // feed data into callback function
         if (api != "o" && func) {
-          // feed data into callback function
-          this._xmlhttp.onreadystatechange = function() { if(this.readyState==4 && this.status==200) { func(this.responseText); console.log("response: " + this.responseText);} };
+          this._xmlhttp.onreadystatechange = function() { if (this.readyState==4 && this.status==200) { func(this.responseText); console.log("response: " + this.responseText);} };
         }
+        
         // set developer key header
         this._xmlhttp.setRequestHeader("X-NAAMA-CLIENT-AUTHENTICATION", 'id="' + this._key + '", version="1"');
+        
         // generate header if needed in certain User API requests
         if (userAuth) {
           var hashcode = ordrin_SHA256(ordrin_SHA256(Ordrin.u.currPass) + Ordrin.u.currEmail + "/" + request + paramsURL);
@@ -85,7 +91,11 @@ Ordrin = {
         this._xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         
         // send out the submission (with form data if present)
-        if(outForm) { this._xmlhttp.send(outForm); } else { this._xmlhttp.send(); }
+        if (outForm) {
+          this._xmlhttp.send(outForm);
+        } else {
+          this._xmlhttp.send();
+        }
       } else {
         // JSONP method
         appends.push(["jsonp", func]);
@@ -100,7 +110,10 @@ Ordrin = {
         
         // user authentication string required for certain requests added into query
         if (userAuth) {
-          if (!(Ordrin.u.currEmail || Ordrin.u.currPass)) { Ordrin._errs.push("API initialization - cannot access user API without setting up current account (user and pass) with u.setCurrAcct"); throw Ordrin._errs; }
+          if (!(Ordrin.u.currEmail || Ordrin.u.currPass)) {
+            Ordrin._errs.push("API initialization - cannot access user API without setting up current account (user and pass) with u.setCurrAcct");
+            throw Ordrin._errs;
+          }
           var hashcode = ordrin_SHA256(ordrin_SHA256(Ordrin.u.currPass) + Ordrin.u.currEmail + "/" + request + paramsURL);
           
           appends.push(["_uauth=1," + Ordrin.u.currEmail + "," + hashcode]);
@@ -124,7 +137,7 @@ Ordrin = {
         // submission time
         // var url = "https://" + api + "-test.ordr.in/" + request + paramsURL + _append; 
         var url = this._site + "/" + request + paramsURL + _append;
-        if(document.getElementById('jsonp')) { document.getElementById('jsonp').parentNode.removeChild(document.getElementById('jsonp')); } // clean up any previous scripts injected into head
+        if (document.getElementById('jsonp')) { document.getElementById('jsonp').parentNode.removeChild(document.getElementById('jsonp')); } // clean up any previous scripts injected into head
         
         // script injection
         var s = document.createElement('script');
@@ -132,7 +145,7 @@ Ordrin = {
         s.type = 'text/javascript';
         s.id = "jsonp";
       
-        if(document.getElementsByTagName('head').length > 0) document.getElementsByTagName('head')[0].appendChild(s);
+        if (document.getElementsByTagName('head').length > 0) document.getElementsByTagName('head')[0].appendChild(s);
       }
   },
   
@@ -199,7 +212,11 @@ Ordrin = {
       if (!Ordrin.checkNums(card_cvc)) { Ordrin._errs.push("Ordrin.o.submit- validation - card security code (only numbers allowed)"); }
       
       if (Ordrin._apiMethod) {
-        if (Ordrin._errs[0]) { _errscopy = Ordrin._errs; Ordrin._errs = []; throw _errscopy; }
+        if (Ordrin._errs[0]) {
+          _errscopy = Ordrin._errs;
+          Ordrin._errs = [];
+          throw _errscopy;
+        }
         
         // using a hidden form to submit the order via POST without reverse origin proxy
         var form = document.createElement("form");
@@ -217,7 +234,9 @@ Ordrin = {
             case "tip": hiddenField.setAttribute("name", "tip"); hiddenField.setAttribute("value", arguments[key]._convertForAPI()); form.appendChild(hiddenField); break;
             case "dTime":
               hiddenField.setAttribute("name", "delivery_date");
-              if (dTime.asap == 1) { hiddenField.setAttribute("value", "ASAP"); } else {
+              if (dTime.asap == 1) {
+                hiddenField.setAttribute("value", "ASAP");
+              } else {
                 var month = arguments[key].getMonth() + 1;
                 if (month < 10) { month = "0" + month; }
                 var day = arguments[key].getDate();
@@ -309,7 +328,9 @@ Ordrin = {
         document.body.appendChild(form);
         form.submit();
       } else {
-        if (dTime.asap == 1) { date = "ASAP"; time = ""; } else {
+        if (dTime.asap == 1) {
+          date = "ASAP"; time = "";
+        } else {
           var month = dTime.getMonth() + 1;
           if (month < 10) { month = "0" + month; }
           var day = dTime.getDate();
@@ -514,7 +535,7 @@ function ordrin_SHA256(s){
 			if (c < 128) {
 				utftext += String.fromCharCode(c);
 			}
-			else if((c > 127) && (c < 2048)) {
+			else if ((c > 127) && (c < 2048)) {
 				utftext += String.fromCharCode((c >> 6) | 192);
 				utftext += String.fromCharCode((c & 63) | 128);
 			}
