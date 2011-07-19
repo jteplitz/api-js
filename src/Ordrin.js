@@ -54,6 +54,8 @@ Ordrin = {
           outForm.push(arguments[i].split("="));
         }
       }
+      
+      appends.push(["_auth", "1," + this._key]);
 
       if (this._xmlhttp) { // reverse origin proxy method
         var url = this._site + "/" + request + paramsURL; // + Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
