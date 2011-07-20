@@ -394,7 +394,7 @@ Ordrin = {
       
       if (nickname) { Ordrin._apiRequest("uG", "u", func, errorFunc, this.currEmail, "addrs", nickname); } else { Ordrin._apiRequest("uG", "u", func, errorFunc, this.currEmail, "addrs"); }
     },
-    updateAddress: function(addr, func) {
+    updateAddress: function(addr, func, errorFunc) {
       if (!(addr instanceof Address)) { Ordrin._errs.push("Ordrin.u.updateAddress - argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
       for (var i=0;i<1;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.u.updateAddress - validation - all arguments required for function; no null values allowed (arguments: Address object, callback function)"); }
@@ -403,7 +403,7 @@ Ordrin = {
       addr.validate();
       Ordrin._apiRequest("uPu", "u", func, errorFunc, this.currEmail, "addrs", addr.nick, "addr=" + addr.street, "addr2=" + addr.street2, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone);  
     },
-    deleteAddress: function(nickname, func) {
+    deleteAddress: function(nickname, func, errorFunc) {
       for (var i=0;i<2;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.u.deleteAddress - validation - all arguments required for function; no null values allowed "); }
       }
