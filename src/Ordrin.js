@@ -215,7 +215,7 @@ Ordrin = {
       
       if (Ordrin._apiMethod) {
         if (Ordrin._errs[0]) {
-          _errscopy = Ordrin._errs;
+          var _errscopy = Ordrin._errs;
           Ordrin._errs = [];
           throw _errscopy;
         }
@@ -331,19 +331,20 @@ Ordrin = {
         form.submit();
       } else {
         if (dTime.asap == 1) {
-          date = "ASAP"; time = "";
+          var date = "ASAP";
+          var time = "";
         } else {
           var month = dTime.getMonth() + 1;
           if (month < 10) { month = "0" + month; }
           var day = dTime.getDate();
           if (day < 10) { day = "0" + day; }
-          date = month + "-" + day;
+          var date = month + "-" + day;
   
           var hours = dTime.getHours();
           if (hours < 10) { hours = "0" + hours; }
           var minutes = dTime.getMinutes();
           if (minutes < 10) { minutes = "0" + minutes; }
-          time = hours + ":" + minutes;
+          var time = hours + ":" + minutes;
         }
 
         Ordrin._apiRequest("o", "o", "", restaurantID, "tray=" + tray, "tip=" + tip._convertForAPI(), "delivery_date=" + date, "delivery_time=" + time, "first_name=" + first_name, "last_name=" + last_name, "addr=" + addr.street, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone, "em=" + em, "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + ccAddr.street, "card_bill_addr2=" + ccAddr.street2, "card_bill_city=" + ccAddr.city, "card_bill_state=" + ccAddr.state, "card_bill_zip=" + ccAddr.zip, "success_url=" + success_url, "fail_url=" + fail_url, "type=RES");
