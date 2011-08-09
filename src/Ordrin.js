@@ -37,7 +37,7 @@ Ordrin = {
       var appends = []; // global appends to query string (timestamp, JSONP, etc.)
       
       // validation
-      if (!(this._key || this._site)) { this._errs.push("API initialization - API must be initialized before making any requests"); }
+      if (!(this._key || this.site)) { this._errs.push("API initialization - API must be initialized before making any requests"); }
       if (this._errs[0]) {
         var _errscopy = this._errs;
         this._errs = [];
@@ -57,7 +57,7 @@ Ordrin = {
       appends.push(["_auth", "1," + this._key]);
 
       if (this._xmlhttp) { // reverse origin proxy method
-        var url = this._site + "/" + request + paramsURL; // + Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
+        var url = this.site + "/" + request + paramsURL; // + Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
         console.log("url: " + url);
         
         for (var i = 0; i < outForm.length; i++) {
@@ -145,7 +145,7 @@ Ordrin = {
         
         // submission time
         // var url = "https://" + api + "-test.ordr.in/" + request + paramsURL + _append; 
-        var url = this._site + "/" + request + paramsURL + _append;
+        var url = this.site + "/" + request + paramsURL + _append;
         if (document.getElementById('jsonp')) { document.getElementById('jsonp').parentNode.removeChild(document.getElementById('jsonp')); } // clean up any previous scripts injected into head
         
         // script injection
