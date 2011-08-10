@@ -23,8 +23,9 @@ Ordrin = {
     if (!site) { this._errs.push("connection - no site provided (your own in case of reverse origin proxy, Ordr.in's in case of JSONP being used)"); }
     if (typeof site === "string"){
       // site is a string so there is only one url
-      this.site   = site;
-      this._sites = null;
+      this._sites.restuarant = site;
+      this._sites.order      = site;
+      this._sites.user       = site;
     }else{
       // site is an object with 3 urls so store it in the sites object
       this._sites = site;
