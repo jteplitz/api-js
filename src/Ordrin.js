@@ -23,7 +23,7 @@ Ordrin = {
     if (!site) { this._errs.push("connection - no site provided (your own in case of reverse origin proxy, Ordr.in's in case of JSONP being used)"); }
     if (typeof site === "string"){
       // site is a string so there is only one url
-      this._sites.restuarant = site;
+      this._sites.restaurant = site;
       this._sites.order      = site;
       this._sites.user       = site;
     }else{
@@ -142,10 +142,16 @@ Ordrin = {
         
         // setting method in query string, and whether or not userAuth required
         switch (api) {
-          case "uG": userAuth = 1; break;
-          case "uP": appends.push(["_method", "POST"]); api = "u"; break;
-          case "uPu": appends.push(["_method", "PUT"]); api = "u"; userAuth = 1; break;
-          case "uD": appends.push(["_method", "DELETE"]); api = "u"; userAuth = 1; break;
+          case "r": 
+            this.site = this._sites.restaurant;
+          break;
+          case "o": 
+            this.site = this._sites.order;
+          break;
+          case "uG": this.site = this._sites.user; userAuth = 1; break;
+          case "uP": this.site = this._sites.user; appends.push(["_method", "POST"]); api = "u"; break;
+          case "uPu": this.site = this._sites.user; appends.push(["_method", "PUT"]); api = "u"; userAuth = 1; break;
+          case "uD": this.site = this._sites.user; appends.push(["_method", "DELETE"]); api = "u"; userAuth = 1; break;
         }
         
         // user authentication string required for certain requests added into query
