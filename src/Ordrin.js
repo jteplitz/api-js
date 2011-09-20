@@ -11,9 +11,16 @@ Ordrin = {
   _apiMethod: "", // whether a reverse origin proxy or JSONP will be used to access API
   _key: "", // API developer key
   _errs: [], // error array pushed into and thrown at end of errors
-  _checkEmail: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, // regex for email
-  _checkNums: /^\s*\d+\s*$/,
-  _checkCC: /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/, 
+
+  _checkEmailPattern : /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, //check email pattern
+  _checkEmail        : function(e) { return this._checkEmailPattern.test(e) }, 
+
+  _checkNumsPattern  : /^\s*\d+\s*$/,
+  _checkNums         : function(n) { return this._checkNumsPattern.test(n) },
+
+  _checkCCPattern    : /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/, 
+  _checkCC           : function(c) { return this._checkCCPattern.test(c) },
+
   site: "", // domain at which API is grabbed from (either own with reverse origin proxy or Ordrin URL if JSONP used)
   _sites: {}, // optional list of orer, restaurant, and user api urls
   
@@ -420,6 +427,7 @@ Ordrin = {
       }
       if (!Ordrin._checkEmail(email)) { Ordrin._errs.push("Ordrin.u.setCurrAcct - validation - email (improperly formatted)"); }
       
+      if( Ordrin._errs.length ) { throw( Ordrin._errs ) }
       this.currEmail = email;
       this.currPass = password;
     },
