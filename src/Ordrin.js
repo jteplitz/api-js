@@ -217,7 +217,7 @@ Ordrin = {
     deliveryCheck: function(restID, dTime, addr, func, errorFunc) {   
       if (!(dTime instanceof Date)) { Ordrin._errs.push("Ordrin.r.deliveryCheck - argument type - date provided must be provided as Date object (standard JS object)"); }
       if (!(addr instanceof Address)) { Ordrin._errs.push("Ordrin.r.deliveryCheck - argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
-      if (!Ordrin._checkNums.test(restID)) { Ordrin._errs.push("Ordrin.r.deliveryCheck - validation - restaurant ID must be provided and numerical"); }
+      if (!Ordrin._checkNums(restID)) { Ordrin._errs.push("Ordrin.r.deliveryCheck - validation - restaurant ID must be provided and numerical"); }
       for (var i=0;i<4;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.r.deliveryCheck - validation - all arguments required; no null values allowed (arguments: restaurant ID, Date object, Address object, callback function)"); }
       }
@@ -230,7 +230,7 @@ Ordrin = {
       if (!(addr instanceof Address)) { Ordrin._errs.push("Ordrin.r.deliveryFee - argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
       if (!(subtotal instanceof Money)) { Ordrin._errs.push("Ordrin.r.deliveryFee - argument type - subtotal must be provided as Money object (included in Ordrin JS API)"); }
       if (!(tip instanceof Money)) { Ordrin._errs.push("Ordrin.r.deliveryFee - argument type - tip must be provided as Money object (included in Ordrin JS API)"); }
-      if (!Ordrin._checkNums.test(restID)) { Ordrin._errs.push("validation - restaurant ID must be provided and numerical"); }
+      if (!Ordrin._checkNums(restID)) { Ordrin._errs.push("validation - restaurant ID must be provided and numerical"); }
       for (var i=0;i<6;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.r.deliveryFee - validation - all arguments required for function; no null values allowed (arguments: restaurant ID, Money object for subtotal, Money object for tip, Date object, Address object, callback function)"); }
       } 
@@ -240,7 +240,7 @@ Ordrin = {
       Ordrin._apiRequest("r", "fee", func, errorFunc, restID, subtotal._convertForAPI(), tip._convertForAPI(), dTime._convertForAPI(), addr._convertForAPI());
     },
     details: function(restaurantID, func, errorFunc) {
-      if (!Ordrin._checkNums.test(restaurantID)) { Ordrin._errs.push("Ordrin.r.details - validation - restaurant ID must be provided and numerical"); }
+      if (!Ordrin._checkNums(restaurantID)) { Ordrin._errs.push("Ordrin.r.details - validation - restaurant ID must be provided and numerical"); }
       for (var i=0;i<2;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.r.details - validation - all arguments required for function; no null values allowed (restaurant ID and callback function)"); }
       }
