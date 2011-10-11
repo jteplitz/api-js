@@ -11,9 +11,16 @@ Ordrin = {
   _apiMethod: "", // whether a reverse origin proxy or JSONP will be used to access API
   _key: "", // API developer key
   _errs: [], // error array pushed into and thrown at end of errors
-  _checkEmail: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, // regex for email
-  _checkNums: /^\s*\d+\s*$/,
-  _checkCC: /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/, 
+
+  _checkEmailPattern : /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, //check email pattern
+  _checkEmail        : function(e) { return this._checkEmailPattern.test(e) }, 
+
+  _checkNumsPattern  : /^\s*\d+\s*$/,
+  _checkNums         : function(n) { return this._checkNumsPattern.test(n) },
+
+  _checkCCPattern    : /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/, 
+  _checkCC           : function(c) { return this._checkCCPattern.test(c) },
+
   site: "", // domain at which API is grabbed from (either own with reverse origin proxy or Ordrin URL if JSONP used)
   _sites: {}, // optional list of orer, restaurant, and user api urls
   
@@ -23,7 +30,7 @@ Ordrin = {
     if (!site) { this._errs.push("connection - no site provided (your own in case of reverse origin proxy, Ordr.in's in case of JSONP being used)"); }
     if (typeof site === "string"){
       // site is a string so there is only one url
-      this._sites.restuarant = site;
+      this._sites.restaurant = site;
       this._sites.order      = site;
       this._sites.user       = site;
     }else{
@@ -88,20 +95,24 @@ Ordrin = {
           break;
           case "uG": 
             this.site = this._sites.user;
+            var url = this.site + "/" + request + paramsURL; //  Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
             this._xmlhttp.open("GET",url,true);
             userAuth = 1;
           break;
           case "uP": 
             this.site = this._sites.user;
+            var url = this.site + "/" + request + paramsURL; //  Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
             this._xmlhttp.open("POST",url,true);
           break;
           case "uPu": 
             this.site = this._sites.user;
+            var url = this.site + "/" + request + paramsURL; //  Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
             this._xmlhttp.open("PUT",url,true);
             userAuth = 1;
             break;
           case "uD": 
             this.site = this._sites.user;
+            var url = this.site + "/" + request + paramsURL; //  Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
             this._xmlhttp.open("DELETE",url,true);
             userAuth = 1;
           break;
@@ -142,10 +153,16 @@ Ordrin = {
         
         // setting method in query string, and whether or not userAuth required
         switch (api) {
-          case "uG": userAuth = 1; break;
-          case "uP": appends.push(["_method", "POST"]); api = "u"; break;
-          case "uPu": appends.push(["_method", "PUT"]); api = "u"; userAuth = 1; break;
-          case "uD": appends.push(["_method", "DELETE"]); api = "u"; userAuth = 1; break;
+          case "r": 
+            this.site = this._sites.restaurant;
+          break;
+          case "o": 
+            this.site = this._sites.order;
+          break;
+          case "uG": this.site = this._sites.user; userAuth = 1; break;
+          case "uP": this.site = this._sites.user; appends.push(["_method", "POST"]); api = "u"; break;
+          case "uPu": this.site = this._sites.user; appends.push(["_method", "PUT"]); api = "u"; userAuth = 1; break;
+          case "uD": this.site = this._sites.user; appends.push(["_method", "DELETE"]); api = "u"; userAuth = 1; break;
         }
         
         // user authentication string required for certain requests added into query
@@ -204,7 +221,7 @@ Ordrin = {
     deliveryCheck: function(restID, dTime, addr, func, errorFunc) {   
       if (!(dTime instanceof Date)) { Ordrin._errs.push("Ordrin.r.deliveryCheck - argument type - date provided must be provided as Date object (standard JS object)"); }
       if (!(addr instanceof Address)) { Ordrin._errs.push("Ordrin.r.deliveryCheck - argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
-      if (!Ordrin._checkNums.test(restID)) { Ordrin._errs.push("Ordrin.r.deliveryCheck - validation - restaurant ID must be provided and numerical"); }
+      if (!Ordrin._checkNums(restID)) { Ordrin._errs.push("Ordrin.r.deliveryCheck - validation - restaurant ID must be provided and numerical"); }
       for (var i=0;i<4;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.r.deliveryCheck - validation - all arguments required; no null values allowed (arguments: restaurant ID, Date object, Address object, callback function)"); }
       }
@@ -217,7 +234,7 @@ Ordrin = {
       if (!(addr instanceof Address)) { Ordrin._errs.push("Ordrin.r.deliveryFee - argument type - address provided must be provided as Address object (included in Ordrin JS API)"); }
       if (!(subtotal instanceof Money)) { Ordrin._errs.push("Ordrin.r.deliveryFee - argument type - subtotal must be provided as Money object (included in Ordrin JS API)"); }
       if (!(tip instanceof Money)) { Ordrin._errs.push("Ordrin.r.deliveryFee - argument type - tip must be provided as Money object (included in Ordrin JS API)"); }
-      if (!Ordrin._checkNums.test(restID)) { Ordrin._errs.push("validation - restaurant ID must be provided and numerical"); }
+      if (!Ordrin._checkNums(restID)) { Ordrin._errs.push("validation - restaurant ID must be provided and numerical"); }
       for (var i=0;i<6;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.r.deliveryFee - validation - all arguments required for function; no null values allowed (arguments: restaurant ID, Money object for subtotal, Money object for tip, Date object, Address object, callback function)"); }
       } 
@@ -227,7 +244,7 @@ Ordrin = {
       Ordrin._apiRequest("r", "fee", func, errorFunc, restID, subtotal._convertForAPI(), tip._convertForAPI(), dTime._convertForAPI(), addr._convertForAPI());
     },
     details: function(restaurantID, func, errorFunc) {
-      if (!Ordrin._checkNums.test(restaurantID)) { Ordrin._errs.push("Ordrin.r.details - validation - restaurant ID must be provided and numerical"); }
+      if (!Ordrin._checkNums(restaurantID)) { Ordrin._errs.push("Ordrin.r.details - validation - restaurant ID must be provided and numerical"); }
       for (var i=0;i<2;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.r.details - validation - all arguments required for function; no null values allowed (restaurant ID and callback function)"); }
       }
@@ -238,7 +255,7 @@ Ordrin = {
   
   // Order API 
   o: {
-    submit: function(restaurantID, tray, tip, dTime, em, first_name, last_name, addr, card_name, card_number, card_cvc, card_expiry, ccAddr, success_url, fail_url, func, errorFunc) {      
+    submit: function(restaurantID, tray, tip, dTime, em, password, first_name, last_name, addr, card_name, card_number, card_cvc, card_expiry, ccAddr, success_url, fail_url, func, errorFunc) {      
       for (var i=0;i<12;i++) {
         if (arguments[i] == "" || arguments[i] == null || typeof arguments[i] === "undefined") { Ordrin._errs.push("Ordrin.o.submit - validation - all arguments required; no null values allowed"); }
       }
@@ -265,7 +282,7 @@ Ordrin = {
         form.setAttribute("method", "POST");
         form.setAttribute("action", Ordrin._site + "/o/" + restaurantID);
 
-        var argNames = ["restaurantID", "tray", "tip", "dTime", "em", "first_name", "last_name", "addr", "card_name", "card_number", "card_cvc", "card_expiry", "ccAddr", "success_url", "fail_url"];
+        var argNames = ["restaurantID", "tray", "tip", "dTime", "em", "password", "first_name", "last_name", "addr", "card_name", "card_number", "card_cvc", "card_expiry", "ccAddr", "success_url", "fail_url"];
 
         // adding in all parameters for order form
         for(var key in arguments) {
@@ -295,6 +312,10 @@ Ordrin = {
                 hiddenField2.setAttribute("value", hours + ":" + minutes);
                 form.appendChild(hiddenField2);
               }
+            break;
+            case "password":
+              hiddenField.setAttribute("name", argNames[key]);
+              hiddenField.setAttribute("value", ordrin_SHA256(arguments[key]));
             break;
             case "addr":
               hiddenField.setAttribute("name", "addr");
@@ -386,7 +407,7 @@ Ordrin = {
           time = hours + ":" + minutes;
         }
 
-        Ordrin._apiRequest("o", "o", func, errorFunc, restaurantID, "tray=" + tray, "tip=" + tip._convertForAPI(), "delivery_date=" + date, "delivery_time=" + time, "first_name=" + first_name, "last_name=" + last_name, "addr=" + addr.street, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone, "em=" + em, "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + ccAddr.street, "card_bill_addr2=" + ccAddr.street2, "card_bill_city=" + ccAddr.city, "card_bill_state=" + ccAddr.state, "card_bill_zip=" + ccAddr.zip, "success_url=" + success_url, "fail_url=" + fail_url, "type=RES");
+        Ordrin._apiRequest("o", "o", func, errorFunc, restaurantID, "tray=" + tray, "tip=" + tip._convertForAPI(), "delivery_date=" + date, "delivery_time=" + time, "first_name=" + first_name, "last_name=" + last_name, "addr=" + addr.street, "city=" + addr.city, "state=" + addr.state, "zip=" + addr.zip, "phone=" + addr.phone, "em=" + em, "password=" + ordrin_SHA256(password), "card_name=" + card_name, "card_number=" + card_number, "card_cvc=" + card_cvc, "card_expiry=" + card_expiry, "card_bill_addr=" + ccAddr.street, "card_bill_addr2=" + ccAddr.street2, "card_bill_city=" + ccAddr.city, "card_bill_state=" + ccAddr.state, "card_bill_zip=" + ccAddr.zip, "success_url=" + success_url, "fail_url=" + fail_url, "type=RES");
       }
     }
   },
@@ -410,6 +431,7 @@ Ordrin = {
       }
       if (!Ordrin._checkEmail(email)) { Ordrin._errs.push("Ordrin.u.setCurrAcct - validation - email (improperly formatted)"); }
       
+      if( Ordrin._errs.length ) { throw( Ordrin._errs ) }
       this.currEmail = email;
       this.currPass = password;
     },

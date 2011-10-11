@@ -31,7 +31,7 @@ Date.prototype.setASAP = function() {
 
 Date.prototype._validate = function() {
   if (!this.asap) {
-    oiNow = new Date();
+    var oiNow = new Date();
     if (this.getTime() < oiNow.getTime()) { Ordrin._errs.push("Date object - validation - date/time cannot be in the past"); }
   }
 }

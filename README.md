@@ -6,7 +6,14 @@ A Javascript wrapper for the Restaurant, User, and Order APIs provided by Ordr.i
 Usage
 -----
 
-        Ordrin.initialize(api_developer_key, site_domain, [enable JSONP with 1 or true]);
+        Ordrin.initialize(api_developer_key, {site_domain}, [enable JSONP with 1 or true]);
+	// site_domain should be configured as an object, to use test api servers:
+        //   { restaurant : 'https://r-test.ordr.in',
+        //     user       : 'https://u-test.ordr.in',
+        //     ordr       : 'https://o-test.ordr.in'
+        //   }
+        // JSONP should be typically enabled, unless this is going to run as a phonegap app or
+        // if you are setting up a reverse proxy
         
         var time = new Date(); // uses Javascript's built-in Date object
         time.setASAP(); // overrides Date properties to ASAP
