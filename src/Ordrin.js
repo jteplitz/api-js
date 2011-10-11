@@ -95,20 +95,24 @@ Ordrin = {
           break;
           case "uG": 
             this.site = this._sites.user;
+            var url = this.site + "/" + request + paramsURL; //  Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
             this._xmlhttp.open("GET",url,true);
             userAuth = 1;
           break;
           case "uP": 
             this.site = this._sites.user;
+            var url = this.site + "/" + request + paramsURL; //  Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
             this._xmlhttp.open("POST",url,true);
           break;
           case "uPu": 
             this.site = this._sites.user;
+            var url = this.site + "/" + request + paramsURL; //  Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
             this._xmlhttp.open("PUT",url,true);
             userAuth = 1;
             break;
           case "uD": 
             this.site = this._sites.user;
+            var url = this.site + "/" + request + paramsURL; //  Ordrin._append; // NEEDS HTTPS:// ADDED AFTER TESTING
             this._xmlhttp.open("DELETE",url,true);
             userAuth = 1;
           break;
